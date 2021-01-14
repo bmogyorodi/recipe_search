@@ -1,10 +1,12 @@
 # recipe_search
+
 TTDS group project, search engine for recipes
 
 The project is set up for Python 3.8.2 (or probably any Python 3.8) and Django 3.1.4.
 The DB is currently set to be SQlite3 for its simplicity, and in production, we should set this to PostgreSQL.
 
 ### Get up and running
+
 1. `pip install pipenv`
 2. `pipenv install` in the folder with Pipfile
 3. Create a file called `.env` with the following contents:
@@ -24,3 +26,9 @@ ALLOWED_HOSTS="127.0.0.1 0.0.0.0 localhost"
 5. `pipenv run python proejct/manage.py createsuperuser`
 6. `pipenv run python project/manage.py runserver 0.0.0.0:8000`
 7. Open up localhost:8000, 0.0.0.0:8000 or 127.0.0.1:8000
+
+### Starting a server after that
+
+Just run `./cmd.sh run`
+There are several more commands in the file I use regularly in other projects and a placeholder for when we'd deploy on a server.
+If you're using tmux, `./cmd.sh tmux` will open up a new session with git, server, and shell as windows. (must run from outside of a tmux shell)
