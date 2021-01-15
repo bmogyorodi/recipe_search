@@ -12,6 +12,7 @@ When running with Docker, the database used is PostgreSQL 13.1, along with Memca
 - To start a daemon: `docker-compose up -d --build`
 - Get output from daemon: `docker-compose logs -f` (adding `-t` shows timestamps)
 - Start interactively: `docker-compose up --build`
+- Create a superuser: `./cmd.sh manage createsuperuser`
 
 ### Stopping docker
 
