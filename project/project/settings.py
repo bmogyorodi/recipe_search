@@ -28,6 +28,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # Apps
+    'core',
+    # 3rd-party libs
 ]
 
 MIDDLEWARE = [
@@ -41,6 +44,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'project.urls'
+
+AUTH_USER_MODEL = 'core.User'
 
 TEMPLATES = [
     {

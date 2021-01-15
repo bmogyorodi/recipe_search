@@ -3,18 +3,18 @@
 ## To activate the pipenv virtualenv instead of spawning a shell
 # . $(pipenv --venv)/bin/activate
 
-# Prepare for a push (CLIENT)
+# Prepare for a push (OUTSIDE Docker)
 if [ "$1" = "prepare" ]; then
-    pipenv install
-    pipenv run python project/manage.py makemigrations
-    pipenv run python project/manage.py makemessages -a
-# Build (CLIENT + SERVER)
+    docker-compose exec web pipenv install
+    docker-compose exec web pipenv run python project/manage.py makemigrations
+    docker-compose exec web pipenv run python project/manage.py makemessages -a
+# Build (INSIDE Docker)
 elif [[ "$1" = "build" ]]; then
     pipenv install
     pipenv run python project/manage.py collectstatic --noinput
     pipenv run python project/manage.py compilemessages
     pipenv run python project/manage.py migrate
-# Run (CLIENT + SERVER)
+# Run (INSIDE Docker)
 elif [[ "$1" = "run" ]]; then
     ./cmd.sh build
     pipenv run gunicorn project.wsgi:application \
@@ -22,17 +22,17 @@ elif [[ "$1" = "run" ]]; then
         --bind 0.0.0.0:8000 \
         --reload \
         --log-level=debug
-# Test project (CLIENT)
+# Test project (OUTSIDE Docker)
 elif [[ "$1" = "test" ]]; then
     if [ -n "$2" ]; then
-        pipenv run python project/manage.py test $2
+        ./cmd.sh manage test $2
     else
-        pipenv run python project/manage.py test project
+        ./cmd.sh manage test project
     fi
-# Use Docker's manage.py
+# Use Docker's manage.py (OUTSIDE Docker)
 elif [[ "$1" = "manage" ]]; then
     docker-compose exec web pipenv run python project/manage.py ${@:2}
-# Create a TMUX session (CLIENT)
+# Create a TMUX session (OUTSIDE Docker)
 elif [[ "$1" = "tmux" ]]; then
     SESSION="ttds"
     BASE_DIR="$(pwd)/"
@@ -49,8 +49,8 @@ elif [[ "$1" = "tmux" ]]; then
     tmux send-keys "docker-compose logs -f" C-m
 
     # Setup shell window
-    tmux new-window -t $SESSION:2 -n 'SHELL' -c "${BASE_DIR}project"
-    tmux send-keys "pipenv run python manage.py shell" C-m
+    tmux new-window -t $SESSION:2 -n 'SHELL' -c "${BASE_DIR}"
+    tmux send-keys "./cmd.sh manage shell"
 
     # Set default window
     tmux select-window -t $SESSION:0
@@ -62,7 +62,6 @@ elif [[ "$1" = "tmux" ]]; then
     else
         tmux attach-session -t $SESSION
     fi
-
 # Start services (SERVER)
 elif [[ "$1" = "start" ]]; then
     # Probably run cmd.sh prepare first

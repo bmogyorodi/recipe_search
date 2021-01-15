@@ -22,10 +22,12 @@ When running with Docker, the database used is PostgreSQL 13.1, along with Memca
 ### Other
 
 - Check status of all images: `docker-compose ps`
+- Whenever you make a change to the DB model, keep Docker running and run `./cmd.sh prepare` to create migrations
+- If you're using tmux, `./cmd.sh tmux` will open up a new session with git, server (running in Docker), and a Django shell as windows. (must run from outside of a tmux shell)
 
 Don't worry about constantly restarting Docker, it shouldn't be necessary. When Django notices a change in a Python file, it restarts itself, and when you change a template, it doesn't even need to restart because these are compiled every time when `DEBUG=True`
 
-## Get up and running **without Docker**
+## Get up and running **without Docker** (not recommended)
 
 1. `pip install pipenv`
 2. Create a file called `.env` with the following contents:
@@ -41,13 +43,13 @@ DEBUG="True"
 ALLOWED_HOSTS="127.0.0.1 0.0.0.0 localhost"
 ```
 
-4. `./cmd.sh build`
+4. `pipenv run python project/manage.py migrate`
 5. `pipenv run python project/manage.py createsuperuser`
-6. `./cmd.sh run`
-7. Open [0.0.0.0:8000](0.0.0.0:8000)
+6. `pipenv run python project/manage.py runserver 0.0.0.0:8000`
+7. Open [0.0.0.0:8000](0.0.0.0:8000) or [localhost:8000](localhost:8000)
 
 ### Starting a server after that
 
-Just run `./cmd.sh run`
-There are several more commands in the file I use regularly in other projects and a placeholder for when we'd deploy on a server.
-If you're using tmux, `./cmd.sh tmux` will open up a new session with git, server, and shell as windows. (must run from outside of a tmux shell)
+- With Docker, you use `docker-compose up -d --build` or if containers have been created already `docker-compose start`
+- Without Docker, it's `pipenv run python project/manage.py runserver 0.0.0.0:8000`
+  - **But**, you should also migrate any new migrations and run `pipenv install` in case there were new changes. It's generally simpler to just use Docker.
