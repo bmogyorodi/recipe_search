@@ -17,7 +17,11 @@ elif [[ "$1" = "build" ]]; then
 # Run (CLIENT + SERVER)
 elif [[ "$1" = "run" ]]; then
     ./cmd.sh build
-    pipenv run python project/manage.py runserver 0.0.0.0:8000
+    pipenv run gunicorn project.wsgi:application \
+        --workers 2 \
+        --bind 0.0.0.0:8000 \
+        --reload \
+        --log-level=debug
 # Test project (CLIENT)
 elif [[ "$1" = "test" ]]; then
     if [ -n "$2" ]; then
@@ -25,6 +29,9 @@ elif [[ "$1" = "test" ]]; then
     else
         pipenv run python project/manage.py test project
     fi
+# Use Docker's manage.py
+elif [[ "$1" = "manage" ]]; then
+    docker-compose exec web pipenv run python project/manage.py ${@:2}
 # Create a TMUX session (CLIENT)
 elif [[ "$1" = "tmux" ]]; then
     SESSION="ttds"
@@ -38,7 +45,8 @@ elif [[ "$1" = "tmux" ]]; then
 
     # Setup server window
     tmux new-window -t $SESSION:1 -n 'SERVER' -c "${BASE_DIR}"
-    tmux send-keys "./cmd.sh run" C-m
+    tmux send-keys "docker-compose up -d --build" C-m
+    tmux send-keys "docker-compose logs -f" C-m
 
     # Setup shell window
     tmux new-window -t $SESSION:2 -n 'SHELL' -c "${BASE_DIR}project"
@@ -54,6 +62,7 @@ elif [[ "$1" = "tmux" ]]; then
     else
         tmux attach-session -t $SESSION
     fi
+
 # Start services (SERVER)
 elif [[ "$1" = "start" ]]; then
     # Probably run cmd.sh prepare first

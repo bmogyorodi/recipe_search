@@ -19,3 +19,10 @@ DATABASES = {
         'PORT': '',
     }
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
+        'LOCATION': os.environ.get('MEMCACHED', 'memcached:11211'),
+    }
+}
