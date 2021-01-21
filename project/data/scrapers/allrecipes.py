@@ -1,6 +1,8 @@
 from ._generic import Scraper
 
 
+# TODO: "139001"-"139999" returns weird things, then it resumes
+
 class AllrecipesScraper(Scraper):
     """
     A scraper for allrecipes.com
