@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     # Apps
     'core',
+    'data',
     # 3rd-party libs
 ]
 
