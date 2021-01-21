@@ -11,7 +11,7 @@ BASE_JSON = {
     "dne": [],
     "recipes": OrderedDict({}),
 }
-RECIPES_TO_SAVE = 50
+RECIPES_TO_SAVE = 10
 
 # If data dir doesn't exist, create it
 DATA_FILE.parent.mkdir(parents=True, exist_ok=True)
@@ -55,11 +55,21 @@ def scrape_range(minimum, maximum):
 
     recipes_scraped = 0
     recipes_dne = 0
+    recipes_skipped = 0
     t0 = time.time()
-    tx = time.time()
     for i in range(minimum, maximum + 1):
+        # Print progress
+        total_time = time.time() - t0
+        recipes_total = recipes_scraped + recipes_dne
+        avg_time = 0 if recipes_total == 0 else total_time / (recipes_total)
+        print(f"Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
+              f"Skipped: {recipes_skipped:<6} | "
+              f"Total: {total_time:>5.0f}s  AVG: {avg_time:>5.2f}s",
+              end="\r", flush=True)
+
         id = str(i)
         if id in dont_scrape:
+            recipes_skipped += 1
             continue
         recipe = scrape_recipe(id)
         # No recipe returned -> doesn't exist
@@ -69,17 +79,15 @@ def scrape_range(minimum, maximum):
         else:
             data["recipes"][id] = recipe
             recipes_scraped += 1
-            # Save every N recipes so as not to lose progress
-            if recipes_scraped % RECIPES_TO_SAVE == 0:
-                with open(DATA_FILE, "w") as f:
-                    json.dump(data, f)
-                print(f"Scraped {RECIPES_TO_SAVE} recipes in "
-                      f"{time.time()-tx:.2f}s")
-                tx = time.time()
+        # Save every N recipes (even if DNE) so as not to lose progress
+        if (recipes_scraped + recipes_dne) % RECIPES_TO_SAVE == 0:
+            with open(DATA_FILE, "w") as f:
+                json.dump(data, f)
     # Save everything at the end
     with open(DATA_FILE, "w") as f:
         json.dump(data, f)
 
+    print("\n\n" + "-" * 30)
     print(f"Recipes scraped: {recipes_scraped}")
     print(f"Recipes DNE:     {recipes_dne}")
     total_time = time.time() - t0
