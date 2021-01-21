@@ -90,30 +90,36 @@ class Scraper():
         recipes_skipped = 0
         t0 = time.time()
         for id in iterable:
-            # Print progress
-            total_time = time.time() - t0
-            recipes_total = recipes_scraped + recipes_dne
-            avg_time = 0 if recipes_total == 0 else total_time / \
-                (recipes_total)
-            print(f" Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
-                  f"Skipped: {recipes_skipped:<6} | "
-                  f"Total: {total_time:>5.0f}s  AVG: {avg_time:>5.2f}s",
-                  end="\r", flush=True)
+            try:
+                # Print progress
+                total_time = time.time() - t0
+                recipes_total = recipes_scraped + recipes_dne
+                avg_time = 0 if recipes_total == 0 else total_time / \
+                    (recipes_total)
+                print(f" Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
+                      f"Skipped: {recipes_skipped:<6} | "
+                      f"Total: {total_time:>5.0f}s  AVG: {avg_time:>5.2f}s | "
+                      f"ID: {id}",
+                      end="\r", flush=True)
 
-            if id in dont_scrape:
-                recipes_skipped += 1
-                continue
-            recipe = self._scrape_recipe(id=id)
-            # No recipe returned -> doesn't exist
-            if recipe is None:
-                data["dne"].append(id)
-                recipes_dne += 1
-            else:
-                data["recipes"][id] = recipe
-                recipes_scraped += 1
-            # Save every N recipes (even if DNE) so as not to lose progress
-            if (recipes_scraped + recipes_dne) % self.RECIPES_TO_SAVE == 0:
+                if id in dont_scrape:
+                    recipes_skipped += 1
+                    continue
+                recipe = self._scrape_recipe(id=id)
+                # No recipe returned -> doesn't exist
+                if recipe is None:
+                    data["dne"].append(id)
+                    recipes_dne += 1
+                else:
+                    data["recipes"][id] = recipe
+                    recipes_scraped += 1
+                # Save every N recipes (even if DNE) so as not to lose progress
+                if (recipes_scraped + recipes_dne) % self.RECIPES_TO_SAVE == 0:
+                    self._save_to_datafile(data)
+            except KeyboardInterrupt:
                 self._save_to_datafile(data)
+                print("\n")
+                return
         # Save everything at the end
         self._save_to_datafile(data)
 
