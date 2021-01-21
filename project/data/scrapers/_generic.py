@@ -95,7 +95,7 @@ class Scraper():
             recipes_total = recipes_scraped + recipes_dne
             avg_time = 0 if recipes_total == 0 else total_time / \
                 (recipes_total)
-            print(f"Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
+            print(f" Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
                   f"Skipped: {recipes_skipped:<6} | "
                   f"Total: {total_time:>5.0f}s  AVG: {avg_time:>5.2f}s",
                   end="\r", flush=True)
