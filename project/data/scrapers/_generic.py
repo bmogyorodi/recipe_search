@@ -2,6 +2,9 @@ from recipe_scrapers import scrape_me
 from pathlib import Path
 import time
 import json
+import re
+import requests
+import xml.etree.ElementTree as ET
 
 
 class Scraper():
@@ -23,12 +26,15 @@ class Scraper():
         "recipes": {},
     }
 
-    # Format string, e.g., "https://www.allrecipes.com/recipe/{id}/"
-    BASE_URL = NotImplemented
-    # Without an extension, e.g. "allrecipes"
+    # Name of scaper without an extension, e.g. "allrecipes"
     NAME = NotImplemented
     # Save to DATA_FILE after N requests
     RECIPES_TO_SAVE = 10
+    # Format string, e.g., "https://www.allrecipes.com/recipe/{id}/"
+    RECIPE_URL_FORMAT = NotImplemented
+    # Regex with ?P<id> group which contains the ID of the recipe
+    # e.g., r"https://www.allrecipes.com/recipe/(?P<id>\d+)/.*"
+    RECIPE_URL_RE = NotImplemented
 
     def __init__(self):
         # If data dir doesn't exist, create it
@@ -43,7 +49,7 @@ class Scraper():
         """
         Format url with **kwargs and return a recipe dict()
         """
-        url = self.BASE_URL.format(**kwargs)
+        url = self.RECIPE_URL_FORMAT.format(**kwargs)
         scraper = scrape_me(url)
 
         # Empty title means HTTP 404
@@ -136,3 +142,90 @@ class Scraper():
 
     class Meta:
         abstract = True
+
+
+class SitemapScraper(Scraper):
+    # Used for the XML tree traversal
+    XML_ELEMENT_URL = "{http://www.sitemaps.org/schemas/sitemap/0.9}url"
+    XML_ELEMENT_LOC = "{http://www.sitemaps.org/schemas/sitemap/0.9}loc"
+
+    # e.g., "https://www.bbc.co.uk/food/sitemap.xml"
+    SITEMAP_URL = NotImplemented
+
+    # Stores recipe IDs when running scrape_range to avoid unnecessary requests
+    ids = None
+
+    def get_ids_from_sitemap(self, url):
+        """
+        Retrieve a list of recipe IDs from a recipe sitemap
+        'url' is a parameter because it's used in RootSitemapScraper
+        """
+        r = re.compile(self.RECIPE_URL_RE)
+        res = requests.get(url)
+        root = ET.fromstring(res.content)
+
+        ids = []
+        for el in root.findall(self.XML_ELEMENT_URL):
+            recipe_url = el.find(self.XML_ELEMENT_LOC).text
+            m = r.match(recipe_url)
+            if m:
+                ids.append(m.groupdict()["id"])
+        return ids
+
+    def get_all_ids(self):
+        """
+        Return a sorted list of all recipe IDs from the given sitemap
+        """
+        return sorted(self.get_ids_from_sitemap(self.SITEMAP_URL))
+
+    def scrape_range(self, limit=None):
+        """
+        Scrape some or all available recipe IDs
+        """
+        if self.ids is None:
+            self.ids = self.get_all_ids()
+        # Optional limit on the number of recipes to be scraped
+        if limit:
+            ids = self.ids[:limit]
+        else:
+            ids = self.ids
+
+        self.scrape_iterable(ids)
+
+
+class RootSitemapScraper(SitemapScraper):
+    # Not used, slightly different convention
+    SITEMAP_URL = None
+
+    # URL of the top-level sitemap with links to nested sitemaps
+    SITEMAPS_ROOT_URL = NotImplemented
+    # Regex which matches a URL to a nested sitemap, groups don't need names
+    # e.g., r"https://www.allrecipes.com/sitemaps/recipe/(\d+)/sitemap.xml"
+    SITEMAP_URL_RE = NotImplemented
+
+    def get_sitemap_list(self):
+        """
+        Retrieves a list of sitemap URLs for the given root sitemap
+        """
+        r = re.compile(self.SITEMAP_URL_RE)
+        res = requests.get(self.SITEMAPS_ROOT_URL)
+        root = ET.fromstring(res.content)
+
+        urls = []
+        for sitemap in root.findall(
+                "{http://www.sitemaps.org/schemas/sitemap/0.9}sitemap"):
+            url = sitemap.find(
+                "{http://www.sitemaps.org/schemas/sitemap/0.9}loc").text
+            m = r.match(url)
+            if m:
+                urls.append(url)
+        return urls
+
+    def get_all_ids(self):
+        """
+        Return a sorted list of all recipe IDs from *all* recipe sitemaps
+        """
+        ids = []
+        for sitemap in self.get_sitemap_list():
+            ids.extend(self.get_ids_from_sitemap(sitemap))
+        return sorted(ids)
