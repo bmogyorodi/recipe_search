@@ -1,10 +1,13 @@
 from recipe_scrapers import scrape_me
 from pathlib import Path
+import logging
 import time
 import json
 import re
 import requests
 import xml.etree.ElementTree as ET
+
+log = logging.getLogger(__name__)
 
 
 class Scraper():
@@ -56,7 +59,11 @@ class Scraper():
         if scraper.title() is None or scraper.title() == "":
             return None
 
-        return self.scraper_to_recipe(scraper)
+        try:
+            return self.scraper_to_recipe(scraper)
+        except Exception:
+            log.exception(f"URL: {url} TITLE: {scraper.title()}")
+            return None
 
     def _save_to_datafile(self, data):
         with open(self.DATA_FILE, "w") as f:
@@ -66,7 +73,7 @@ class Scraper():
         """
         Convert scraper object into a dict()
         """
-        return {
+        obj = {
             "title": scraper.title(),
             "author": scraper.author(),
             "canonical_url": scraper.canonical_url(),
@@ -80,6 +87,11 @@ class Scraper():
             "total_time": scraper.total_time(),
             "yields": scraper.yields(),
         }
+        try:
+            obj["cuisine"] = scraper.cuisine()
+        except AttributeError:
+            obj["cuisine"] = scraper.schema.cuisine()
+        return obj
 
     def scrape_iterable(self, iterable):
         """
@@ -168,7 +180,11 @@ class SitemapScraper(Scraper):
         """
         r = re.compile(self.RECIPE_URL_RE)
         res = requests.get(url)
-        root = ET.fromstring(res.content)
+        try:
+            root = ET.fromstring(res.content)
+        except ET.ParseError:
+            log.exception(f"Sitemap URL: {url}")
+            return []
 
         ids = []
         for el in root.findall(self.XML_ELEMENT_URL):
@@ -188,14 +204,10 @@ class SitemapScraper(Scraper):
         """
         Scrape some or all available recipe IDs
         """
-        if self.ids is None:
-            self.ids = self.get_all_ids()
+        ids = self.get_all_ids()
         # Optional limit on the number of recipes to be scraped
         if limit:
-            ids = self.ids[:limit]
-        else:
-            ids = self.ids
-
+            ids = ids[:limit]
         self.scrape_iterable(ids)
 
 
@@ -227,11 +239,15 @@ class RootSitemapScraper(SitemapScraper):
                 urls.append(url)
         return urls
 
-    def get_all_ids(self):
+    def get_all_ids(self, reload=False):
         """
         Return a sorted list of all recipe IDs from *all* recipe sitemaps
+        If 'reload' is True, previously stored IDs will be ignored and reloaded
         """
-        ids = []
+        if self.ids is not None and not reload:
+            return self.ids
+        self.ids = []
         for sitemap in self.get_sitemap_list():
-            ids.extend(self.get_ids_from_sitemap(sitemap))
-        return sorted(ids)
+            self.ids.extend(self.get_ids_from_sitemap(sitemap))
+        self.ids.sort()
+        return self.ids
