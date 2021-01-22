@@ -85,7 +85,8 @@ class Scraper():
         """
         'iterable' must be an iterable, e.g.: list(), set(), range(), map()
         """
-        print(f"Total recipes to scrape: {len(iterable)}")
+        total_recipes = len(iterable)
+        print(f"Total recipes to scrape: {total_recipes}")
 
         # Load previously scraped data
         with open(self.DATA_FILE, "r") as f:
@@ -121,8 +122,11 @@ class Scraper():
                 # Print progress
                 total_time = time.time() - t0
                 avg_time = total_time / recipes_requests
+                recipes_remaining = total_recipes - (
+                    recipes_scraped + recipes_dne + recipes_skipped)
                 print(f" Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
-                      f"Skipped: {recipes_skipped:<6} | "
+                      f"Skipped: {recipes_skipped:<6} "
+                      f"Remaining: {recipes_remaining:<6} | "
                       f"Total: {total_time:>5.0f}s  AVG: {avg_time:>5.2f}s | "
                       f"ID: {id}",
                       end="\r", flush=True)
