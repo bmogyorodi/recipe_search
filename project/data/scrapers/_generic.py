@@ -93,7 +93,7 @@ class Scraper():
             obj["cuisine"] = scraper.schema.cuisine()
         return obj
 
-    def scrape_iterable(self, iterable):
+    def scrape_iterable(self, iterable, overwrite=False):
         """
         'iterable' must be an iterable, e.g.: list(), set(), range(), map()
         """
@@ -103,8 +103,11 @@ class Scraper():
         # Load previously scraped data
         with open(self.DATA_FILE, "r") as f:
             data = json.load(f)
-        # Already scraped or don't exist
-        dont_scrape = set(data["dne"]) | set(data["recipes"].keys())
+        # Already scraped or don't exist; unless you want to overwrite
+        if overwrite:
+            dont_scrape = set(data["dne"])
+        else:
+            dont_scrape = set(data["dne"]) | set(data["recipes"].keys())
 
         recipes_scraped = 0
         recipes_dne = 0
@@ -200,7 +203,7 @@ class SitemapScraper(Scraper):
         """
         return sorted(self.get_ids_from_sitemap(self.SITEMAP_URL))
 
-    def scrape_range(self, limit=None):
+    def scrape_range(self, limit=None, overwrite=False):
         """
         Scrape some or all available recipe IDs
         """
@@ -208,7 +211,7 @@ class SitemapScraper(Scraper):
         # Optional limit on the number of recipes to be scraped
         if limit:
             ids = ids[:limit]
-        self.scrape_iterable(ids)
+        self.scrape_iterable(ids, overwrite=overwrite)
 
 
 class RootSitemapScraper(SitemapScraper):
