@@ -85,9 +85,11 @@ class Scraper():
         """
         'iterable' must be an iterable, e.g.: list(), set(), range(), map()
         """
+        print(f"Total recipes to scrape: {len(iterable)}")
+
+        # Load previously scraped data
         with open(self.DATA_FILE, "r") as f:
             data = json.load(f)
-
         # Already scraped or don't exist
         dont_scrape = set(data["dne"]) | set(data["recipes"].keys())
 
