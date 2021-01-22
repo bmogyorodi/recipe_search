@@ -7,6 +7,8 @@ https://allrecipes.com/
 https://bbc.co.uk/
     https://bbc.com/ (redirects to bbc.co.uk for Food)
 https://bbcgoodfood.com/
+https://thehappyfoodie.co.uk/
+https://eatsmarter.com/
 
 
 # Have a Sitemap
@@ -46,7 +48,6 @@ https://domesticate-me.com/
 https://downshiftology.com/
 https://www.dr.dk/
 https://www.eatingbirdfood.com/
-https://eatsmarter.com/
 https://eatsmarter.de/
 https://eatwhattonight.com/
 https://epicurious.com/
@@ -127,7 +128,6 @@ https://tastesoflizzyt.com
 https://tasteofhome.com
 https://tasty.co
 https://tastykitchen.com/
-https://thehappyfoodie.co.uk/
 https://thekitchn.com/
 https://thenutritiouskitchen.co/
 https://thepioneerwoman.com/
