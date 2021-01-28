@@ -9,6 +9,7 @@ https://bbc.co.uk/
 https://bbcgoodfood.com/
 https://thehappyfoodie.co.uk/
 https://eatsmarter.com/
+https://greatbritishchefs.com/
 
 
 # Have a Sitemap
@@ -65,7 +66,6 @@ https://gimmesomeoven.com/
 https://recietas.globo.com/
 https://gonnawantseconds.com/
 https://gousto.co.uk/
-https://greatbritishchefs.com/
 https://halfbakedharvest.com/
 https://www.hassanchef.com/
 https://www.heb.com/
@@ -145,3 +145,19 @@ https://en.wikibooks.org/
 https://yummly.com/
 
 """
+
+from .allrecipes import AllRecipesScraper
+from .bbcfood import BBCFoodScraper
+from .bbcgoodfood import BBCGoodFoodScraper
+from .eatsmarter import EatSmarterScraper
+from .greatbritishchefs import GreatBritishChefsScraper
+from .thehappyfoodie import TheHappyFoodieScraper
+
+SCRAPERS = {
+    AllRecipesScraper.NAME: AllRecipesScraper,
+    BBCFoodScraper.NAME: BBCFoodScraper,
+    BBCGoodFoodScraper.NAME: BBCGoodFoodScraper,
+    EatSmarterScraper.NAME: EatSmarterScraper,
+    GreatBritishChefsScraper.NAME: GreatBritishChefsScraper,
+    TheHappyFoodieScraper.NAME: TheHappyFoodieScraper,
+}
