@@ -32,7 +32,7 @@ class Scraper():
     # Name of scaper without an extension, e.g. "allrecipes"
     NAME = NotImplemented
     # Save to DATA_FILE after N requests
-    RECIPES_TO_SAVE = 10
+    RECIPES_TO_SAVE = 100
     # Format string, e.g., "https://www.allrecipes.com/recipe/{id}/"
     RECIPE_URL_FORMAT = NotImplemented
     # Regex with ?P<id> group which contains the ID of the recipe
