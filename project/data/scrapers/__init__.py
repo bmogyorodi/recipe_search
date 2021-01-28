@@ -5,9 +5,12 @@
 # Implemented
 https://www.acouplecooks.com
 https://allrecipes.com/
+https://amazingribs.com/
+https://ambitiouskitchen.com/
 https://bbc.co.uk/
     https://bbc.com/ (redirects to bbc.co.uk for Food)
 https://bbcgoodfood.com/
+https://bonappetit.com/
 https://claudia.abril.com.br/
 https://eatsmarter.com/
 https://greatbritishchefs.com/
@@ -15,12 +18,9 @@ https://thehappyfoodie.co.uk/
 
 
 # Have a Sitemap
-https://amazingribs.com/ (AiO, /tested-recipes/{category}/{id})
-https://ambitiouskitchen.com/ (sitemap-pt-post-2021-01.xml)
 https://averiecooks.com/ (post-sitemap1.xml)
 https://bakingmischief.com/ (post-sitemap.xml)
 https://bettycrocker.com/ (AiO, at https://www.bettycrocker.com/recipe.xml, /recipes/{id}/{hash-like id})
-https://bonappetit.com/ (?year=2021&month=1&week=3)
 https://bowlofdelicious.com/ (post-sitemap.xml)
 https://budgetbytes.com/ (post-sitemap1.xml)
 
@@ -148,20 +148,28 @@ https://yummly.com/
 
 from .acouplecooks import ACoupleCooksScraper
 from .allrecipes import AllRecipesScraper
+from .amazingribs import AmazingRibsScraper
+from .ambitiouskitchen import AmbitiousKitchenScraper
 from .bbcfood import BBCFoodScraper
 from .bbcgoodfood import BBCGoodFoodScraper
+from .bonappetit import BonAppetitScraper
 from .claudiaabril import ClaudiaAbrilScraper
 from .eatsmarter import EatSmarterScraper
 from .greatbritishchefs import GreatBritishChefsScraper
 from .thehappyfoodie import TheHappyFoodieScraper
 
-SCRAPERS = {
-    ACoupleCooksScraper.NAME: ACoupleCooksScraper,
-    AllRecipesScraper.NAME: AllRecipesScraper,
-    BBCFoodScraper.NAME: BBCFoodScraper,
-    BBCGoodFoodScraper.NAME: BBCGoodFoodScraper,
-    ClaudiaAbrilScraper.NAME: ClaudiaAbrilScraper,
-    EatSmarterScraper.NAME: EatSmarterScraper,
-    GreatBritishChefsScraper.NAME: GreatBritishChefsScraper,
-    TheHappyFoodieScraper.NAME: TheHappyFoodieScraper,
-}
+SCRAPER_LIST = [
+    ACoupleCooksScraper,
+    AllRecipesScraper,
+    AmazingRibsScraper,
+    AmbitiousKitchenScraper,
+    BBCFoodScraper,
+    BBCGoodFoodScraper,
+    BonAppetitScraper,
+    ClaudiaAbrilScraper,
+    EatSmarterScraper,
+    GreatBritishChefsScraper,
+    TheHappyFoodieScraper,
+]
+
+SCRAPERS = {s.NAME: s for s in SCRAPER_LIST}
