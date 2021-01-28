@@ -8,6 +8,6 @@ class TheHappyFoodieScraper(SitemapScraper):
 
     NAME = "thehappyfoodie"
     RECIPE_URL_FORMAT = "https://thehappyfoodie.co.uk/recipes/{id}/"
-    RECIPE_URL_RE = r"https://thehappyfoodie.co.uk/recipes/(?P<id>[^/]+)$"
+    RECIPE_URL_RE = r"https://thehappyfoodie.co.uk/recipes/(?P<id>[^/]+)/?$"
 
     SITEMAP_URL = "https://thehappyfoodie.co.uk/sitemap.xml"
