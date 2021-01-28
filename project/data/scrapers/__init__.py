@@ -3,18 +3,18 @@
 #### List of available websites for scraping, thanks to recipe-scrapers ####
 
 # Implemented
+https://www.acouplecooks.com
 https://allrecipes.com/
 https://bbc.co.uk/
     https://bbc.com/ (redirects to bbc.co.uk for Food)
 https://bbcgoodfood.com/
-https://thehappyfoodie.co.uk/
+https://claudia.abril.com.br/
 https://eatsmarter.com/
 https://greatbritishchefs.com/
+https://thehappyfoodie.co.uk/
 
 
 # Have a Sitemap
-https://claudia.abril.com.br/ (?yyyy=2021&mm=01&dd=21)
-https://www.acouplecooks.com (post-sitemap1.xml)
 https://amazingribs.com/ (AiO, /tested-recipes/{category}/{id})
 https://ambitiouskitchen.com/ (sitemap-pt-post-2021-01.xml)
 https://averiecooks.com/ (post-sitemap1.xml)
@@ -146,17 +146,21 @@ https://yummly.com/
 
 """
 
+from .acouplecooks import ACoupleCooksScraper
 from .allrecipes import AllRecipesScraper
 from .bbcfood import BBCFoodScraper
 from .bbcgoodfood import BBCGoodFoodScraper
+from .claudiaabril import ClaudiaAbrilScraper
 from .eatsmarter import EatSmarterScraper
 from .greatbritishchefs import GreatBritishChefsScraper
 from .thehappyfoodie import TheHappyFoodieScraper
 
 SCRAPERS = {
+    ACoupleCooksScraper.NAME: ACoupleCooksScraper,
     AllRecipesScraper.NAME: AllRecipesScraper,
     BBCFoodScraper.NAME: BBCFoodScraper,
     BBCGoodFoodScraper.NAME: BBCGoodFoodScraper,
+    ClaudiaAbrilScraper.NAME: ClaudiaAbrilScraper,
     EatSmarterScraper.NAME: EatSmarterScraper,
     GreatBritishChefsScraper.NAME: GreatBritishChefsScraper,
     TheHappyFoodieScraper.NAME: TheHappyFoodieScraper,
