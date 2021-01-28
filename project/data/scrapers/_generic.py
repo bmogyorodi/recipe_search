@@ -1,5 +1,6 @@
 from recipe_scrapers import scrape_me
 from pathlib import Path
+from datetime import timedelta
 import logging
 import time
 import json
@@ -55,7 +56,7 @@ class Scraper():
         url = self.RECIPE_URL_FORMAT.format(**kwargs)
         scraper = scrape_me(url)
 
-        # Empty title means HTTP 404
+        # Empty title means HTTP 404 or e.g. category/recipe list
         if scraper.title() is None or scraper.title() == "":
             return None
 
@@ -75,22 +76,33 @@ class Scraper():
         """
         obj = {
             "title": scraper.title(),
-            "author": scraper.author(),
             "canonical_url": scraper.canonical_url(),
-            "image": scraper.image(),
-            "ingredients": scraper.ingredients(),
-            "instructions": scraper.instructions(),
             "language": scraper.language(),
-            "nutrients": scraper.nutrients(),
-            "ratings": scraper.ratings(),
-            "reviews": scraper.reviews(),
-            "total_time": scraper.total_time(),
-            "yields": scraper.yields(),
         }
+
+        # e.g. GreatBritishChefs has no schema and doesn't implement author()
+        def get_val_or_empty(scraper, attr):
+            try:
+                # scraper.author() always exists but depends on schema if it
+                # isn't implemented on the non-abstract scraper
+                return getattr(scraper, attr, lambda: "")()
+            except AttributeError:
+                return ""
+        obj["author"] = get_val_or_empty(scraper, "author")
+        obj["image"] = get_val_or_empty(scraper, "image")
+        obj["ingredients"] = get_val_or_empty(scraper, "ingredients")
+        obj["instructions"] = get_val_or_empty(scraper, "instructions")
+        obj["nutrients"] = get_val_or_empty(scraper, "nutrients")
+        obj["ratings"] = get_val_or_empty(scraper, "ratings")
+        obj["reviews"] = get_val_or_empty(scraper, "reviews")
+        obj["total_time"] = get_val_or_empty(scraper, "total_time")
+        obj["yields"] = get_val_or_empty(scraper, "yields")
+        # Some scrapers might have schema with cuisine but cuisine() undefined
         try:
             obj["cuisine"] = scraper.cuisine()
         except AttributeError:
-            obj["cuisine"] = scraper.schema.cuisine()
+            obj["cuisine"] = get_val_or_empty(
+                getattr(scraper, "schema", {}), "cuisine")
         return obj
 
     def scrape_iterable(self, iterable, overwrite=False):
@@ -98,7 +110,7 @@ class Scraper():
         'iterable' must be an iterable, e.g.: list(), set(), range(), map()
         """
         total_recipes = len(iterable)
-        print(f"Total recipes to scrape: {total_recipes}")
+        print(f"Total recipes available to scrape: {total_recipes}")
 
         # Load previously scraped data
         with open(self.DATA_FILE, "r") as f:
@@ -108,6 +120,9 @@ class Scraper():
             dont_scrape = set(data["dne"])
         else:
             dont_scrape = set(data["dne"]) | set(data["recipes"].keys())
+
+        print(f"Recipes already scraped: {len(data['recipes'])}")
+        print(f"Recipes marked as DNE: {len(data['dne'])}")
 
         recipes_scraped = 0
         recipes_dne = 0
@@ -136,14 +151,19 @@ class Scraper():
 
                 # Print progress
                 total_time = time.time() - t0
+                total_delta = timedelta(seconds=round(total_time))
                 avg_time = total_time / recipes_requests
                 recipes_remaining = total_recipes - (
                     recipes_scraped + recipes_dne + recipes_skipped)
+                estimated_delta = timedelta(
+                    seconds=round(recipes_remaining * avg_time))
                 print(f" Scraped: {recipes_scraped:<6} DNE: {recipes_dne:<6} "
                       f"Skipped: {recipes_skipped:<6} "
                       f"Remaining: {recipes_remaining:<6} | "
-                      f"Total: {total_time:>5.0f}s  AVG: {avg_time:>5.2f}s | "
-                      f"ID: {id}",
+                      f"Total: {total_delta}  AVG: {avg_time:>5.2f}s  "
+                      f"Estimated: {estimated_delta} | "
+                      f"ID: {id}"
+                      "\033[K",  # ANSI "erase to end of line"
                       end="\r", flush=True)
             except KeyboardInterrupt:
                 self._save_to_datafile(data)
@@ -197,11 +217,20 @@ class SitemapScraper(Scraper):
                 ids.append(m.groupdict()["id"])
         return ids
 
-    def get_all_ids(self):
+    def get_all_ids(self, reload=False):
         """
         Return a sorted list of all recipe IDs from the given sitemap
         """
-        return sorted(self.get_ids_from_sitemap(self.SITEMAP_URL))
+        if self.ids is not None and not reload:
+            return self.ids
+        self.ids = sorted(self.get_ids_from_sitemap(self.SITEMAP_URL))
+        return self.ids
+
+    def num_recipes(self):
+        """
+        Return the number of recipe *available to scrape*
+        """
+        return len(self.get_all_ids())
 
     def scrape_range(self, limit=None, overwrite=False):
         """
