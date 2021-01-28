@@ -6,7 +6,7 @@ class ACoupleCooksScraper(RootSitemapScraper):
     A scraper for acouplecooks.com
     """
 
-    NAME = "acouplecoks"
+    NAME = "acouplecooks"
     RECIPE_URL_FORMAT = "https://www.acouplecooks.com/{id}/"
     # e.g. https://www.acouplecooks.com/easy-mint-water-recipe/ (no distinction)
     RECIPE_URL_RE = r"https://www.acouplecooks.com/(?P<id>[^/]+)/?$"
