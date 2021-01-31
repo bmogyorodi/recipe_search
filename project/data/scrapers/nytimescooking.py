@@ -1,7 +1,7 @@
 from ._generic import RootSitemapScraper
 
 
-class NYTimesCooking(RootSitemapScraper):
+class NYTimesCookingScraper(RootSitemapScraper):
     """
     A scraper for cooking.nytimes.com
     """
