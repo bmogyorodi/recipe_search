@@ -49,3 +49,9 @@ class BaseModel(models.Model):
             self.created = timezone.now()
         self.modified = timezone.now()
         return super(BaseModel, self).save(*args, **kwargs)
+class Recipe(models.Model):
+    title=models.CharField(max_length=100)
+    image_Url=models.URLField(max_length=200)
+    def __str__(self):
+        return self.title
+    
