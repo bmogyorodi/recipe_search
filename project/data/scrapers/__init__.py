@@ -13,7 +13,10 @@ https://bbcgoodfood.com/
 https://bonappetit.com/
 https://claudia.abril.com.br/
 https://eatsmarter.com/
+https://epicurious.com/
 https://greatbritishchefs.com/
+https://cooking.nytimes.com/
+https://tasty.co
 https://thehappyfoodie.co.uk/
 
 
@@ -51,7 +54,6 @@ https://www.dr.dk/
 https://www.eatingbirdfood.com/
 https://eatsmarter.de/
 https://eatwhattonight.com/
-https://epicurious.com/
 https://recipes.farmhousedelivery.com/
 https://fifteenspatulas.com/
 https://finedininglovers.com/
@@ -100,7 +102,6 @@ https://myrecipes.com/
 https://healthyeating.nhlbi.nih.gov/
 https://nourishedbynutrition.com/
 https://nutritionbynathalie.com/blog
-https://cooking.nytimes.com/
 https://ohsheglows.com/
 https://www.paleorunningmomma.com/
 https://www.panelinha.com.br/
@@ -126,7 +127,6 @@ https://sunbasket.com/
 https://sweetpeasandsaffron.com/
 https://tastesoflizzyt.com
 https://tasteofhome.com
-https://tasty.co
 https://tastykitchen.com/
 https://thekitchn.com/
 https://thenutritiouskitchen.co/
