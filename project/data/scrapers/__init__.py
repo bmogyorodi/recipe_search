@@ -155,7 +155,11 @@ from .bbcgoodfood import BBCGoodFoodScraper
 from .bonappetit import BonAppetitScraper
 from .claudiaabril import ClaudiaAbrilScraper
 from .eatsmarter import EatSmarterScraper
+from .epicurious import EpicuriousScraper
 from .greatbritishchefs import GreatBritishChefsScraper
+from .myrecipes import MyRecipesScraper
+from .nytimescooking import NYTimesCookingScraper
+from .tasty import TastyScraper
 from .thehappyfoodie import TheHappyFoodieScraper
 
 SCRAPER_LIST = [
@@ -168,7 +172,11 @@ SCRAPER_LIST = [
     BonAppetitScraper,
     ClaudiaAbrilScraper,
     EatSmarterScraper,
+    EpicuriousScraper,
     GreatBritishChefsScraper,
+    MyRecipesScraper,
+    NYTimesCookingScraper,
+    TastyScraper,
     TheHappyFoodieScraper,
 ]
 
