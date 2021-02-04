@@ -12,18 +12,6 @@ import pickle
 log = logging.getLogger(__name__)
 
 
-"""
-TODO
-
-with bz2.BZ2File("file.pbz2", 'wb') as f:
-    pickle.dump(data, f)
-
-with bz2.BZ2File("file.pbz2", ‘rb’) as f:
-    data = pickle.load(data)
-
-"""
-
-
 class Scraper():
     """
     A base Scraper class which implements essential methods for scraping general
@@ -54,6 +42,8 @@ class Scraper():
     RECIPE_URL_RE = NotImplemented
     # Whether wild mode is to be used for the scraper
     WILD_MODE = False
+    # In case we need to hotfix a class from recipe_scrapers
+    RECIPE_SCRAPER_CLASS = None
 
     def __init__(self):
         # If data dir doesn't exist, create it
@@ -69,6 +59,11 @@ class Scraper():
         """
         url = self.RECIPE_URL_FORMAT.format(**kwargs)
         scraper = scrape_me(url, wild_mode=self.WILD_MODE)
+        # If a custom class has been specified, always use it
+        if self.RECIPE_SCRAPER_CLASS:
+            scraper = self.RECIPE_SCRAPER_CLASS(url)
+        else:
+            scraper = scrape_me(url)
 
         # Empty title means HTTP 404 or e.g. category/recipe list
         if scraper.title() is None or scraper.title() == "":
