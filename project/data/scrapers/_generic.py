@@ -104,7 +104,7 @@ class Scraper():
                 # scraper.author() always exists but depends on schema if it
                 # isn't implemented on the non-abstract scraper
                 return getattr(scraper, attr, lambda: "")()
-            except AttributeError:
+            except (AttributeError, NotImplementedError):
                 return ""
         obj["author"] = get_val_or_empty(scraper, "author")
         obj["image"] = get_val_or_empty(scraper, "image")
