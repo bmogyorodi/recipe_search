@@ -279,6 +279,11 @@ class RootSitemapScraper(SitemapScraper):
         """
         r = re.compile(self.SITEMAP_URL_RE)
         res = requests.get(self.SITEMAPS_ROOT_URL)
+        try:
+            root = ET.fromstring(res.content)
+        except ET.ParseError:
+            log.exception(f"ROOT Sitemap URL: {self.SITEMAPS_ROOT_URL}")
+            return []
         root = ET.fromstring(res.content)
 
         urls = []
