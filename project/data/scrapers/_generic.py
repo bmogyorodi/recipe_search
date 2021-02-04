@@ -7,8 +7,22 @@ import json
 import re
 import requests
 import xml.etree.ElementTree as ET
+import bz2
+import pickle
 
 log = logging.getLogger(__name__)
+
+
+"""
+TODO
+
+with bz2.BZ2File("file.pbz2", 'wb') as f:
+    pickle.dump(data, f)
+
+with bz2.BZ2File("file.pbz2", ‘rb’) as f:
+    data = pickle.load(data)
+
+"""
 
 
 class Scraper():
@@ -43,11 +57,10 @@ class Scraper():
     def __init__(self):
         # If data dir doesn't exist, create it
         self._DATA_DIR.parent.mkdir(parents=True, exist_ok=True)
-        self.DATA_FILE = self._DATA_DIR / f"{self.NAME}.json"
+        self.DATA_FILE = self._DATA_DIR / f"{self.NAME}.pbz2"
         # Create the data file if it DNE
         if not self.DATA_FILE.exists():
-            with open(self.DATA_FILE, "w") as f:
-                json.dump(self._BASE_JSON, f)
+            self._save_to_datafile(self._BASE_JSON)
 
     def _scrape_recipe(self, **kwargs):
         """
@@ -67,8 +80,12 @@ class Scraper():
             return None
 
     def _save_to_datafile(self, data):
-        with open(self.DATA_FILE, "w") as f:
-            json.dump(data, f)
+        with bz2.BZ2File(self.DATA_FILE, "wb") as f:
+            pickle.dump(data, f)
+
+    def load_from_datafile(self):
+        with bz2.BZ2File(self.DATA_FILE, "rb") as f:
+            return pickle.load(f)
 
     def scraper_to_recipe(self, scraper):
         """
@@ -113,8 +130,7 @@ class Scraper():
         print(f"Total recipes available to scrape: {total_recipes}")
 
         # Load previously scraped data
-        with open(self.DATA_FILE, "r") as f:
-            data = json.load(f)
+        data = self.load_from_datafile()
         # Already scraped or don't exist; unless you want to overwrite
         if overwrite:
             dont_scrape = set(data["dne"])

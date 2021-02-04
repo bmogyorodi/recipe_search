@@ -155,7 +155,11 @@ from .bbcgoodfood import BBCGoodFoodScraper
 from .bonappetit import BonAppetitScraper
 from .claudiaabril import ClaudiaAbrilScraper
 from .eatsmarter import EatSmarterScraper
+from .epicurious import EpicuriousScraper
 from .greatbritishchefs import GreatBritishChefsScraper
+from .myrecipes import MyRecipesScraper
+from .nytimescooking import NYTimesCookingScraper
+from .tasty import TastyScraper
 from .thehappyfoodie import TheHappyFoodieScraper
 
 SCRAPER_LIST = [
@@ -168,8 +172,32 @@ SCRAPER_LIST = [
     BonAppetitScraper,
     ClaudiaAbrilScraper,
     EatSmarterScraper,
+    EpicuriousScraper,
     GreatBritishChefsScraper,
+    MyRecipesScraper,
+    NYTimesCookingScraper,
+    TastyScraper,
     TheHappyFoodieScraper,
 ]
 
 SCRAPERS = {s.NAME: s for s in SCRAPER_LIST}
+
+
+def load_all_data():
+    """
+    Returns a dict() with loaded data for all available scrapers
+    """
+    return {s.NAME: s().load_from_datafile() for s in SCRAPER_LIST}
+
+
+def update_all_scrapers():
+    """
+    Runs scrape_range on every scraper. This will take a while...
+    The scrapers with date sitemaps take several minutes just to get all IDs.
+    """
+    for S in SCRAPER_LIST:
+        s = S()
+        print("=" * 50)
+        print("=" * 10 + f"{s.NAME:^30}" + "=" * 10)
+        print("=" * 50)
+        s.scrape_range()
