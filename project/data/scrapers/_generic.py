@@ -3,7 +3,6 @@ from pathlib import Path
 from datetime import timedelta
 import logging
 import time
-import json
 import re
 import requests
 import xml.etree.ElementTree as ET
@@ -53,6 +52,8 @@ class Scraper():
     # Regex with ?P<id> group which contains the ID of the recipe
     # e.g., r"https://www.allrecipes.com/recipe/(?P<id>\d+)/.*"
     RECIPE_URL_RE = NotImplemented
+    # Whether wild mode is to be used for the scraper
+    WILD_MODE = False
 
     def __init__(self):
         # If data dir doesn't exist, create it
@@ -67,7 +68,7 @@ class Scraper():
         Format url with **kwargs and return a recipe dict()
         """
         url = self.RECIPE_URL_FORMAT.format(**kwargs)
-        scraper = scrape_me(url)
+        scraper = scrape_me(url, wild_mode=self.WILD_MODE)
 
         # Empty title means HTTP 404 or e.g. category/recipe list
         if scraper.title() is None or scraper.title() == "":
