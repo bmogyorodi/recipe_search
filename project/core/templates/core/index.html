@@ -1,13 +1,38 @@
 {% extends "core/base.html"%}
 {% block content%}
-        <p>{{results_count}} results found</p>
+<form action="/" method="get">
+  <input id="search_field" type="text" name="search_field" value="{{ current_name }}">
+  <input type="submit" value="Search">
+</form>
+{% if search_exp %}
+<p> Search for "{{search_exp}}" returned {{results_count}} results!</p>
+{% endif%}
+        
         {% for recipe in page_obj %}
+        
         <article class="media content-section">
-            <div class="media-body">
-              <h2><a class="article-title" href="#">{{ recipe.title }}</a></h2>
-              <img src={{recipe.image_Url}} width="150" height="150">
+            <div class="media-body p-3">
+              <table>
+                <tr>
+                  <th colspan="2">
+                    <h2><a class="article-title" href="{{recipe.canonical_url}}">{{ recipe.title }}</a></h2>
+                  </th>
+                </tr>
+                <tr>
+                  <td><img src={{recipe.image_url}} width="150" height="150"></td>
+                  <td>
+                    <p>Rating: {{recipe.ratings}}</p>
+                    <p>Time to prepare: {{recipe.total_time}}</p>
+                    <p>Yields: {{recipe.yields}}</p>
+                  </td>
+                </tr>
+              </table>
+              
+              
             </div>
+
           </article>
+
         {%endfor%}
         <div class="pagination">
           <span class="step-links">

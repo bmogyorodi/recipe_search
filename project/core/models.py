@@ -51,7 +51,11 @@ class BaseModel(models.Model):
         return super(BaseModel, self).save(*args, **kwargs)
 class Recipe(models.Model):
     title=models.CharField(max_length=100)
-    image_Url=models.URLField(max_length=200)
+    image_url=models.URLField(max_length=200)
+    canonical_url=models.URLField(max_length=200)
+    total_time=models.IntegerField()
+    ratings=models.DecimalField()
+    yields=models.CharField(max_length=100)
     def __str__(self):
         return self.title
     
