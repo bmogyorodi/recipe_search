@@ -83,6 +83,10 @@ class Scraper():
         with bz2.BZ2File(self.DATA_FILE, "wb") as f:
             pickle.dump(data, f)
 
+    def load_from_datafile(self):
+        with bz2.BZ2File(self.DATA_FILE, "rb") as f:
+            return pickle.load(f)
+
     def scraper_to_recipe(self, scraper):
         """
         Convert scraper object into a dict()
@@ -126,8 +130,7 @@ class Scraper():
         print(f"Total recipes available to scrape: {total_recipes}")
 
         # Load previously scraped data
-        with bz2.BZ2File(self.DATA_FILE, "rb") as f:
-            data = pickle.load(f)
+        data = self.load_from_datafile()
         # Already scraped or don't exist; unless you want to overwrite
         if overwrite:
             dont_scrape = set(data["dne"])
