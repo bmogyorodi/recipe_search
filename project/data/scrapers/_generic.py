@@ -1,4 +1,4 @@
-from recipe_scrapers import scrape_me
+from recipe_scrapers import scrape_me, NoSchemaFoundInWildMode
 from pathlib import Path
 from datetime import timedelta
 import logging
@@ -153,7 +153,10 @@ class Scraper():
                     recipes_skipped += 1
                     continue
 
-                recipe = self._scrape_recipe(id=id)
+                try:
+                    recipe = self._scrape_recipe(id=id)
+                except NoSchemaFoundInWildMode:
+                    recipe = None
                 recipes_requests += 1
                 # No recipe returned -> doesn't exist
                 if recipe is None:
