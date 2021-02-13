@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Token(models.Model):
-    title = models.CharField(127)
+    title = models.CharField(max_length=127)
     recipes = models.ManyToManyField(
         "Recipe",
         through="RecipeToken",
@@ -21,7 +21,7 @@ class RecipeToken(models.Model):
 
 
 class Tag(models.Model):
-    title = models.CharField(50)
+    title = models.CharField(max_length=50)
 
 
 class Ingredient(models.Model):
