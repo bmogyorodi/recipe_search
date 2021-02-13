@@ -1,5 +1,4 @@
 from django.db import models
-from core.models import BaseModel
 
 
 class Token(models.Model):
@@ -16,10 +15,24 @@ class RecipeToken(models.Model):
     token = models.ForeignKey("Token", on_delete=models.CASCADE)
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
     position = models.PositiveIntegerField()
+    # TODO: Django choice field with int
+    # TODO: title, instructions, ingredient, author
+    token_type = models.IntegerChoices  # ...
 
 
-class Cuisine(models.Model):
+class Tag(models.Model):
     title = models.CharField(50)
+
+
+class Ingredient(models.Model):
+    title = models.CharField(max_length=128)
+
+
+class RecipeIngredient(models.Model):
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
+    ingredient = models.ForeignKey("Ingredient", on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(null=True, blank=True)
+    unit = models.CharField(max_length=128, blank=True)
 
 
 class Recipe(models.Model):
@@ -31,12 +44,15 @@ class Recipe(models.Model):
     total_time
 
     # TODO: max length is 307, so likely also long strings
+    # TODO: @Dimitris parse into a number
     yields
+
+    # TODO: @Peter store nutrition, each nutrient in a separate field with NB
     """
 
     # ID is implicit and corresponds to the
     # TODO: at least one recipe has title length 746
-    title = models.CharField(max_length=255)
+    title = models.CharField(max_length=128)
     # At least one canonical url has 203 characters from our current dataset
     canonical_url = models.TextField(blank=True)
     # At least one image url has 251 characters from our current dataset
@@ -50,13 +66,14 @@ class Recipe(models.Model):
     # Maximum length is 169 so far so hopefully shouldn't cause problems
     source_id = models.CharField(max_length=255)
 
-    # TODO: need to ensure rating is in range [0, 5] otherwise set null
+    # TODO: @Peter need to ensure rating is in range [0, 5] otherwise set null
     ratings = models.FloatField(blank=True, null=True)
     # TODO: Clean up and concatenate in a readable + parseable format
     ingredients = models.TextField(blank=True)
 
-    cuisines = models.ManyToManyField(
-        Cuisine,
+    # TODO: split cuisines on ",", strip, lowercase, create models
+    tags = models.ManyToManyField(
+        Tag,
         related_name="recipes",
         related_query_name="recipe")
 
