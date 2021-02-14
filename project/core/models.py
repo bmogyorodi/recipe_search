@@ -49,3 +49,4 @@ class BaseModel(models.Model):
             self.created = timezone.now()
         self.modified = timezone.now()
         return super(BaseModel, self).save(*args, **kwargs)
+

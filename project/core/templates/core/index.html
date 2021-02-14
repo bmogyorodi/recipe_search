@@ -2,11 +2,50 @@
 {% block content%}
 <form action="/" method="get">
   <input id="search_field" type="text" name="search_field" value="{{ current_name }}">
+  <input type="hidden" id="include_list" name="include_list" value="">
+  <input type="hidden" id="exclude_list" name="exclude_list" value="">
   <input type="submit" value="Search">
 </form>
+<table id="ingredients_table">
+  <tr>
+    <th>
+      <label for="include_ingredients">Include ingredients:</label>
+    </th>
+    <th>
+      <label for="exclude_ingredients">Exclude ingredients:</label>
+    </th>
+  </tr>
+  <tr>
+    <td>
+      <input id="include_ingredients"  oninput="add_ingredient()" name="include_ingredients" type="text" list="ingredientlist" Placeholder="Search Ingredients" class="form-control" style="width:300px;">
+    </td>
+    <td>
+      <input id="exclude_ingredients" oninput="exclude_ingredient()"name="exclude_ingredients" type="text" list="ingredientlist" Placeholder="Search Ingredients" class="form-control" style="width:300px;">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <ul id="added_ingredients">
+
+      </ul>
+    </td>
+    <td>
+      <ul id="excluded_ingredients">
+
+      </ul>
+    </td>
+  </tr>
+</table>
+<button type="button" onclick="ResetIngredients()">Reset</button>
 {% if search_exp %}
 <p> Search for "{{search_exp}}" returned {{results_count}} results!</p>
 {% endif%}
+    
+    <datalist id="ingredientlist">
+ {% for results in ingredients %}
+        <option value="{{ results}}">
+ {% endfor %}
+    </datalist>
         
         {% for recipe in page_obj %}
         
@@ -19,11 +58,9 @@
                   </th>
                 </tr>
                 <tr>
-                  <td><img src={{recipe.image_url}} width="150" height="150"></td>
+                  <td><img src={{recipe.image}} width="150" height="150"></td>
                   <td>
                     <p>Rating: {{recipe.ratings}}</p>
-                    <p>Time to prepare: {{recipe.total_time}}</p>
-                    <p>Yields: {{recipe.yields}}</p>
                   </td>
                 </tr>
               </table>
@@ -51,4 +88,67 @@
               {% endif %}
           </span>
       </div>
+      <script>
+
+        var included=[]
+        var excluded=[]
+        var allItem=[]
+        {% for results in ingredients %}
+        allItem.push("{{results.name}}");
+        {% endfor %}
+      function add_ingredient()
+      {
+        const new_element=document.getElementById("include_ingredients").value;
+        if(!allItem.includes(new_element) || included.includes(new_element) || excluded.includes(new_element))
+        {
+          return 
+        }
+        document.getElementById("include_ingredients").value="";
+        var ingredientlist=document.getElementById("ingredientlist");
+
+
+
+        var added_item=document.createElement('LI');
+        var textnode=document.createTextNode(new_element);
+        added_item.appendChild(textnode);
+        included.push(new_element)
+        document.getElementById("added_ingredients").appendChild(added_item);
+        AddToHiddenField(document.getElementById("include_list"),new_element);
+      }
+      function exclude_ingredient()
+      {
+        const new_element=document.getElementById("exclude_ingredients").value;
+        
+
+        if(!allItem.includes(new_element) || excluded.includes(new_element)|| included.includes(new_element))
+        {
+          return
+        }
+        document.getElementById("exclude_ingredients").value=""
+        var added_item=document.createElement('LI');
+        var textnode=document.createTextNode(new_element);
+        added_item.appendChild(textnode);
+        excluded.push(new_element);
+        document.getElementById("excluded_ingredients").appendChild(added_item);
+        AddToHiddenField(document.getElementById("exclude_list"),new_element);
+      }
+      function AddToHiddenField(inputField,element)
+      {
+        if(inputField.value=="")
+        {
+          inputField.value+=element;
+          return;
+        }
+        inputField.value+=","+element;
+
+
+      }
+      function ResetIngredients()
+      {
+        document.getElementById("exclude_list").value="";
+        document.getElementById("include_list").value="";
+        document.getElementById("excluded_ingredients").innerHTML='';
+        document.getElementById("added_ingredients").innerHTML='';
+      }
+      </script>
 {% endblock content %}

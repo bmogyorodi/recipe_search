@@ -13,6 +13,7 @@ gunicorn = "~=20.0"
 recipe-scrapers = "*"
 requests = "*"
 nltk = "*"
+django-autocomplete-light = "*"
 
 [requires]
 python_version = "3.8"
