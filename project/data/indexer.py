@@ -1,6 +1,7 @@
 import re
 import pickle
 import os
+import html
 from pathlib import Path
 from datetime import datetime
 import bz2
@@ -32,6 +33,7 @@ class Indexer:
         text += ' ' + recipe.get('author', '') if recipe.get('author', '') is not None else ''
         text += ' ' + recipe['instructions']
         text += ' ' + ' '.join(recipe['ingredients'])
+        text = html.unescape(text.replace('&amp;', '&'))
         return [self._wnl.lemmatize(token.strip("'")) for token in self._token_re.findall(text.lower())
                 if token.strip("'") and token.strip("'") not in self._stopwords]
 
