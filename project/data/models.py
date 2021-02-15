@@ -26,6 +26,10 @@ class Tag(models.Model):
 
 class Ingredient(models.Model):
     title = models.CharField(max_length=128)
+    # TODO References to recipes with ingredient
+
+    def __str__(self):
+        return str(self.title)
 
 
 class RecipeIngredient(models.Model):
@@ -82,8 +86,3 @@ class Recipe(models.Model):
 
     def __str__(self):
         return self.title
-class Ingredient(models.Model):
-    name=models.CharField(300)
-    num_item=models.IntegerField()
-    def __str__(self):
-        return str(self.name)
