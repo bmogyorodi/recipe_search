@@ -1,8 +1,8 @@
 from django.db import models
 
 from core.models import CleanableModel
-from .data_loader import DataLoader
-from .utils import (parse_ingredient_quantity, parse_nutrient, truncate)
+from .utils import (parse_ingredient_quantity, parse_nutrient, truncate, parse_total_time,
+                    parse_title, parse_html_text)
 
 
 class Token(CleanableModel):
@@ -129,14 +129,17 @@ class Recipe(CleanableModel):
     unsaturatedFatContent = models.FloatField(blank=True, null=True)
 
     def clean(self, *args, **kwargs):
-        # Rating must be in range [0, 5] otherwise set null
-        if self.ratings > self.RATINGS_MAX or self.ratings < self.RATINGS_MIN:
+        # Rating must be in range [0, 5]
+        # If rating is within [5, 100] divide by 20, otherwise if out of range set null
+        if self.ratings > self.RATINGS_MAX and self.ratings <= 100:
+            self.ratings /= 20
+        elif self.ratings > self.RATINGS_MAX or self.ratings < self.RATINGS_MIN:
             self.ratings = None
         # Truncate and escape title and author to their max length
-        self.title = truncate(DataLoader.parse_title(self.title), 127)
-        self.author = truncate(DataLoader.parse_title(self.author), 127)
+        self.title = parse_title(self.title, 127)
+        self.author = truncate(parse_html_text(self.author), 127)
         # Convert total_time to an integer if not already parsed
-        self.total_time = DataLoader.parse_total_time(self.total_time)
+        self.total_time = parse_total_time(self.total_time)
         # Serving size and yields could also potentially overflow max length
         self.servingSize = truncate(self.servingSize, 64)
         self.yields = truncate(self.yields, 64)
