@@ -12,7 +12,27 @@ class User(AbstractUser):
     pass
 
 
-class BaseModel(models.Model):
+class CleanableModel(models.Model):
+    # In order to ensure a model is cleaned before saving
+    is_cleaned = False
+
+    class Meta:
+        abstract = True
+
+    def save(self, *args, **kwargs):
+        # Ensure the model is cleaned before saving
+        if not self.is_cleaned:
+            self.clean()
+        return super().save(*args, **kwargs)
+
+    def clean(self, *args, **kwargs):
+        """
+        If a model needs cleaning, overwrite this method but don't call it
+        """
+        self.is_cleaned = True
+
+
+class BaseModel(CleanableModel):
     """
     A base model for all non-User models, storing information about creation
     and modification of each object, as well allowing to deactivate an object
@@ -26,27 +46,14 @@ class BaseModel(models.Model):
 
     objects = BaseManager()
 
-    # In order to ensure a model is cleaned before saving
-    is_cleaned = False
-
-    def clean(self, *args, **kwargs):
-        """
-        If a model needs cleaning, overwrite this method but don't call it
-        """
-        self.is_cleaned = True
-
     class Meta:
         abstract = True
         ordering = ('-active', '-modified')
 
     def save(self, *args, **kwargs):
         ''' On save, update timestamps '''
-        # Ensure the model is cleaned before saving
-        if not self.is_cleaned:
-            self.clean()
         # Set created and modified timestamps
         if not self.id:
             self.created = timezone.now()
         self.modified = timezone.now()
         return super(BaseModel, self).save(*args, **kwargs)
-
