@@ -1,0 +1,40 @@
+{% block recipe_card %}
+
+<div class="card-block card rec-card mb-3">
+  <div class="row no-gutters">
+  <a href="{{ recipe.canoical_url }}" class="stretched-link"></a>
+    <div class="img-col col-md-2">
+      <img src="{{ recipe.image }}" class="card-img" alt="{{ recipe.title }}">
+    </div>
+    <div class="col-md-10">
+      <div class="card-body">
+        <p class="card-text favicon-text text-muted float-right">
+          <img class="mr-1" src="{{ recipe.source_favicon }}" height="16", width="16">
+          {{ recipe.source_name }}
+        </p>
+        <h5 class="card-title">{{ recipe.title }}</h5>
+        <p class="card-text">
+            <ul class="list-inline">
+              {% for ingredient, is_match in recipe.ingredients %}
+                <li class="list-inline-item {% if is_match %} ingr-match {% endif %}">{{ ingredient }}</li>
+              {% endfor %}
+            </ul>
+            {% if recipe.ratings %}
+              <p class="star-rating">
+                <span class="fas fa-star {% if recipe.ratings >= 1 %} checked {% endif %}"></span>
+                <span class="fas fa-star {% if recipe.ratings >= 2 %} checked {% endif %}"></span>
+                <span class="fas fa-star {% if recipe.ratings >= 3 %} checked {% endif %}"></span>
+                <span class="fas fa-star {% if recipe.ratings >= 4 %} checked {% endif %}"></span>
+                <span class="fas fa-star {% if recipe.ratings >= 5 %} checked {% endif %}"></span>
+              </p>
+            {% endif %}
+        </p>
+        {% if recipe.total_time %}
+          <p class="card-text"><small class="text-muted">{{ recipe.total_time }} minutes</small></p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock recipe_card %}

@@ -40,6 +40,58 @@ class IngredientForm(forms.ModelForm):
 """
 
 
+def new(request):
+    recipes = [
+        {
+            "title": "Roast chicken with forty cloves of garlic",
+            "source_name": "BBC Food",
+            "source_favicon": "https://www.bbc.co.uk/favicon.ico",
+            "ratings": 3,
+            "image": "https://ichef.bbci.co.uk//food/ic/food_16x9_832/recipes/chicken_with_40_cloves_22211_16x9.jpg",
+            "canonical_url": "https://www.bbc.co.uk/food/recipes/chicken_with_40_cloves_22211",
+            "ingredients": [
+                ("Shallots", False),
+                ("Chicken", True),
+                ("Lemon", False),
+                ("Butter", False)
+            ],
+            "total_time": 60
+        },
+        {
+            "title": "Easy Chicken Fajitas",
+            "source_name": "BBC GoodFood",
+            "source_favicon": "https://www.bbcgoodfood.com/favicon.ico",
+            "ratings": 4,
+            "image": "https://images.immediate.co.uk/production/volatile/sites/30/2020/08/chicken-fajitas-2-d7172f8.jpg",
+            "canonical_url": "https://www.bbcgoodfood.com/recipes/easy-chicken-fajitas",
+            "ingredients": [
+                ("Red Onion", False),
+                ("Smoked Paprika", True),
+                ("Chicken Breasts", True),
+                ("Red Chilli", False)
+            ],
+            "total_time": 25
+        },
+        {
+            "title": "Roast chicken with forty cloves of garlic",
+            "source_name": "BBC Food",
+            "source_favicon": "https://www.bbc.co.uk/favicon.ico",
+            "ratings": None,
+            "image": "https://ichef.bbci.co.uk/food/ic/food_16x9_832/recipes/how_to_make_roast_71135_16x9.jpg",
+            "canonical_url": "https://www.bbc.co.uk/food/recipes/how_to_make_roast_71135",
+            "ingredients": [
+                ("Shallots", False),
+                ("Chicken", True),
+                ("Lemon", False),
+                ("Butter", False)
+            ],
+            "total_time": None
+        }
+    ]
+
+    return render(request, 'core/new.html', {"recipes": recipes})
+
+
 def home(request):
     #recipe_list=Recipe.objects.all()
     recipe_list = [
