@@ -121,3 +121,10 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+
+# Ingredient Phrase Tagger
+
+INGREDIENT_PHRASE_TAGGER_MODEL = (
+    BASE_DIR.parent / "ingredient_tagger" /
+    "model/20210220_1410-nyt-ingredients-snapshot-2015-49381ad.crfmodel")

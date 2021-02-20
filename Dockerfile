@@ -10,6 +10,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Install crf++
+RUN git clone https://github.com/mtlynch/crfpp.git
+RUN cd crfpp && \
+    ./configure && \
+    make && \
+    make install && \
+    ldconfig
+
 ADD . /code
 WORKDIR /code
 

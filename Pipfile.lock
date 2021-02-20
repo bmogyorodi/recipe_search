@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6d4a5e6ee39438aa8a6ede5d083eb8f13f54b2a55d2b637ced79aa79c2065414"
+            "sha256": "7f2fb2cf09283785a80cf364314df6e0eb36b8a5fe503be9babb28507a9a52ad"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -115,6 +115,10 @@
             ],
             "markers": "python_version >= '2.7' and python_version not in '3.0, 3.1, 3.2, 3.3'",
             "version": "==2.10"
+        },
+        "ingredient-phrase-tagger": {
+            "git": "https://github.com/mtlynch/ingredient-phrase-tagger",
+            "ref": "49381adb3e66bf61aeaa66cbac026b255449813e"
         },
         "isodate": {
             "hashes": [
