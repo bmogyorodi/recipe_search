@@ -88,8 +88,11 @@ def new(request):
             "total_time": None
         }
     ]
+    paginator = Paginator(recipes, 2)
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
 
-    return render(request, 'core/new.html', {"recipes": recipes})
+    return render(request, 'core/new.html', {'page_obj': page_obj,"recipes": recipes,'ingredients':ingredients_list})
 
 
 def home(request):
