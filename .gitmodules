@@ -1,0 +1,3 @@
+[submodule "ingredient_tagger/ingredient-phrase-tagger"]
+	path = ingredient_tagger/ingredient-phrase-tagger
+	url = git@github.com:mtlynch/ingredient-phrase-tagger.git
