@@ -41,7 +41,7 @@ class Tag(CleanableModel):
 
     def clean(self, *args, **kwargs):
         # Get rid of whitespace, lower-case, and truncate
-        self.title = truncate(self.title.strip().lower(), 64)
+        self.title = truncate(parse_html_text(self.title.strip().lower()), 64)
         self.is_cleaned = True
 
     def __str__(self):
