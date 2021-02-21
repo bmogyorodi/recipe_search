@@ -7,17 +7,19 @@
 <div class="container p-4">
   <div class="row">
     <div class="col-md-11 p-1">
-    <div class="input-group input-group-lg">
-        <input type="text" oninput="update_searchfield(this.value)" class="form-control" placeholder="Find a recipe" aria-label="Recipient's username" aria-describedby="button-addon2">
-        <div class="input-group-append">
-          <button class="btn btn-dark" type="submit" form="search_form" id="button-addon2">
-            <span class="fas fa-search"></span>
-          </button>
-        </div>
-    </div>
+      <form id="searchForm" action="/search" method="get" class="input-group input-group-lg">
+          <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe" value={{ search_params.search_exp }}>
+          <input type="hidden" id="IncludeListInput" name="include" value="">
+          <input type="hidden" id="ExcludeListInput" name="exclude" value="">
+          <div class="input-group-append">
+            <button class="btn btn-dark" type="submit">
+              <span class="fas fa-search"></span>
+            </button>
+          </div>
+      </form>
     </div>
     <div class="col-md-1 p-1">
-      <button class="btn btn-block btn-lg btn-secondary" type="button" data-toggle="collapse" data-target="#advancedSearchBox">
+      <button class="btn btn-block btn-lg btn-secondary" type="button" data-toggle="collapse" data-target="#advancedSearchBox" title="Advanced Search">
         <span class="fas fa-sliders-h">
       </button>
     </div>
@@ -25,35 +27,48 @@
       <div class="card card-body card-block">
         <div class="row">
           <div class="col-md-4">
-            <form>
-              <div class="form-group">
-                <label for="IngrIncludeInput"><h6 style="color: #32ab30; font-weight: 600;">Ingredients to include</h5></label>
-                <input type="text" oninput="add_ingredient(this.value)" list="ingredientlist" class="form-control" id="IngrIncludeInput" placeholder="Enter ingredient">
+            <label for="IngrIncludeInput"><h6 style="color: #32ab30; font-weight: 600;">Ingredients to include</h5></label>
+            <div class="input-group">
+              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrIncludeInput" placeholder="Enter ingredient">
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit" id="IngrIncludeButton">
+                  <span class="fas fa-arrow-right">
+                </button>
               </div>
-            </form>
-            
+            </div>
           </div>
-          <div class="col-md-8" id="added_ingredients">
+          <div class="col-md-8">
+            <ul id="IncludedIngrList" class="list-inline">
+              {% for ingr in search_params.included_ingr %}
+                <li class="list-inline-item">{{ ingr }}</li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
         <hr/>
         <div class="row">
           <div class="col-md-4">
-            <form>
-              <div class="form-group">
-                <label for="IngrExcludeInput"><h6 style="color: #eb4034; font-weight: 600;">Ingredients to exclude</h5></label>
-                <input type="text"oninput="exclude_ingredient(this.value)" class="form-control" list="ingredientlist" id="IngrExcludeInput" placeholder="Enter ingredient">
+            <label for="IngrExcludeInput"><h6 style="color: #eb4034; font-weight: 600;">Ingredients to exclude</h5></label>
+            <div class="input-group">
+              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrExcludeInput" placeholder="Enter ingredient">
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit" id="IngrExcludeButton">
+                  <span class="fas fa-arrow-right">
+                </button>
               </div>
-            </form>
-            
+            </div>
           </div>
-          <div class="col-md-8" id="excluded_ingredients">
+          <div class="col-md-8">
+            <ul id="ExcludedIngrList" class="list-inline">
+              {% for ingr in search_params.excluded_ingr %}
+                <li class="list-inline-item">{{ ingr }}</li>
+              {% endfor %}
+            </ul>
           </div>
         </div>
-        <div class="input-group-append">
-          <button class="btn btn-dark" type="button" onclick="ResetIngredients()" id="reset_button">
-            Reset
-          </button>
+        <hr/>
+        <div class="container">
+          <button id="ClearIngrButton" class="btn btn-danger float-right">Clear</button>
         </div>
       </div>
     </div>
@@ -64,5 +79,15 @@
          <option value="{{ results}}">
   {% endfor %}
      </datalist>
+
+<!-- All Possible Ingredients -->
+<datalist id="IngredientList">
+  {% for ingredient in ingredients %}
+    <option value="{{ ingredient }}">
+  {% endfor %}
+</datalist>
+
+{{ search_params.included_ingr|json_script:"IncludedIngrData" }}
+{{ search_params.excluded_ingr|json_script:"ExcludedIngrData" }}
 
 {% endblock search_box %}

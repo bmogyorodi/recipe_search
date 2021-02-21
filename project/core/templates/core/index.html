@@ -1,94 +1,48 @@
 {% extends "core/base.html"%}
-{% block content%}
-{% load static %}
+{% load paginator %}
+{% block content %}
 
-<form action="/" method="get">
-  <input id="search_field" type="text" name="search_field" value="{{ current_name }}">
-  <input type="hidden" id="include_list" name="include_list" value="">
-  <input type="hidden" id="exclude_list" name="exclude_list" value="">
-  <input type="submit" value="Search">
-</form>
-<table id="ingredients_table">
-  <tr>
-    <th>
-      <label for="include_ingredients">Include ingredients:</label>
-    </th>
-    <th>
-      <label for="exclude_ingredients">Exclude ingredients:</label>
-    </th>
-  </tr>
-  <tr>
-    <td>
-      <input id="include_ingredients"  oninput="add_ingredient()" name="include_ingredients" type="text" list="ingredientlist" Placeholder="Search Ingredients" class="form-control" style="width:300px;">
-    </td>
-    <td>
-      <input id="exclude_ingredients" oninput="exclude_ingredient()"name="exclude_ingredients" type="text" list="ingredientlist" Placeholder="Search Ingredients" class="form-control" style="width:300px;">
-    </td>
-  </tr>
-  <tr>
-    <td>
-      <ul id="added_ingredients">
-
-      </ul>
-    </td>
-    <td>
-      <ul id="excluded_ingredients">
-
-      </ul>
-    </td>
-  </tr>
-</table>
-<button type="button" onclick="ResetIngredients()">Reset</button>
-{% if search_exp %}
-<p> Search for "{{search_exp}}" returned {{results_count}} results!</p>
-{% endif%}
-    
-    <datalist id="ingredientlist">
- {% for results in ingredients %}
-        <option value="{{ results}}">
- {% endfor %}
-    </datalist>
-        
-        {% for recipe in page_obj %}
-        
-        <article class="media content-section">
-            <div class="media-body p-3">
-              <table>
-                <tr>
-                  <th colspan="2">
-                    <h2><a class="article-title" href="{{recipe.canonical_url}}">{{ recipe.title }}</a></h2>
-                  </th>
-                </tr>
-                <tr>
-                  <td><img src={{recipe.image}} width="150" height="150"></td>
-                  <td>
-                    <p>Rating: {{recipe.ratings}}</p>
-                  </td>
-                </tr>
-              </table>
-              
-              
-            </div>
-
-          </article>
-
-        {%endfor%}
-        <div class="pagination">
-          <span class="step-links">
-              {% if page_obj.has_previous %}
-                  <a href="?page=1">&laquo; first</a>
-                  <a href="?page={{ page_obj.previous_page_number }}">previous</a>
-              {% endif %}
-      
-              <span class="current">
-                  Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-              </span>
-      
-              {% if page_obj.has_next %}
-                  <a href="?page={{ page_obj.next_page_number }}">next</a>
-                  <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
-              {% endif %}
-          </span>
+<nav class="navbar navbar-dark bg-dark">
+    <!-- Navbar content -->
+    <a class="navbar-brand" href="#">Recipe Search</a>
+</nav>
+<div id="searchBox">
+  {% block search_box %}
+    {% include 'core/search_box.html' %}
+  {% endblock search_box %}
+</div>
+<div id="searchResults">
+    <div id="searchResultsContainer" class="container py-4">
+      <div class="card-column">
+        {% for recipe in page %}
+          {% block recipe_card %}
+            {% include 'core/recipe_card.html' %}
+          {% endblock recipe_card %}
+        {% endfor %}
       </div>
-      <script src="{% static '/js/ingredient.js' %}"></script>
+      <nav>
+        <ul class="pagination justify-content-center">
+          <li class="page-item {% if page.has_previous is not True %} disabled {% endif %}">
+            <a class="page-link" {% if page.has_previous %}href="?{% url_replace page=page.previous_page_number %}"{% endif %} tabindex="-1">
+              <span class="fas fa-chevron-left"></span>
+            </a>
+          </li>
+          {% for pg in page.paginator.page_range %}
+            <li class="page-item {% if pg == page.number %}active{% endif %}">
+              <a class="page-link" href="?{% url_replace page=pg %}">
+                {{ pg }}
+                {% if pg == page.number %}<span class="sr-only">(current)</span>{% endif %}
+              </a>
+            </li>
+          {% endfor %}
+          <li class="page-item {% if page.has_next is not True %} disabled {% endif %}">
+            <a class="page-link" {% if page.has_next %}href="?{% url_replace page=page.next_page_number %}"{% endif %}>
+              <span class="fas fa-chevron-right"></span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+</div>
+
 {% endblock content %}
