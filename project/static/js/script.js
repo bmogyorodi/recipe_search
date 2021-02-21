@@ -1,5 +1,6 @@
 includedIngr = JSON.parse(document.getElementById('IncludedIngrData').textContent);
 excludedIngr = JSON.parse(document.getElementById('ExcludedIngrData').textContent);
+allIngr = JSON.parse(document.getElementById('AllIngrData').textContent);
 
 
 document.getElementById("searchForm").onsubmit = function() {
@@ -24,7 +25,7 @@ document.getElementById("IngrExcludeButton").onclick = function() {
 document.getElementById("ClearIngrButton").onclick = clearIngredients;
 
 function addIngredient(ingrArray, ingr, listId) {
-    if (!includedIngr.includes(ingr) && !excludedIngr.includes(ingr)) {
+    if (!includedIngr.includes(ingr) && !excludedIngr.includes(ingr) && allIngr.includes(ingr)) {
         // Add ingredient to list
         ingrArray.push(ingr);
         
@@ -46,7 +47,7 @@ function removeIngredient(ingrArray, ingr, listId) {
     if (idx > -1) {
         ingrArray.splice(idx, 1);
 
-        // Remove the ingredient from the displayed list
+        // TODO: Remove the ingredient from the displayed list
     }
 
 }

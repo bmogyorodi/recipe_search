@@ -89,5 +89,6 @@
 
 {{ search_params.included_ingr|json_script:"IncludedIngrData" }}
 {{ search_params.excluded_ingr|json_script:"ExcludedIngrData" }}
+{{ ingredients|json_script:"AllIngrData" }}
 
 {% endblock search_box %}
