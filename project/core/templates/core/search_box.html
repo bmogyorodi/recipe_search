@@ -1,13 +1,9 @@
 {% block search_box %}
-<form action="new" method="get" id="search_form">
-  <input type="hidden" id="search_field" type="text" name="search_field" value="{{ current_name }}">  
-  <input type="hidden" id="include_list" name="include_list" value="">
-  <input type="hidden" id="exclude_list" name="exclude_list" value="">
-</form>
+
 <div class="container p-4">
   <div class="row">
     <div class="col-md-11 p-1">
-      <form id="searchForm" action="/search" method="get" class="input-group input-group-lg">
+      <form id="searchForm" action="/" method="get" class="input-group input-group-lg">
           <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe" value={{ search_params.search_exp }}>
           <input type="hidden" id="IncludeListInput" name="include" value="">
           <input type="hidden" id="ExcludeListInput" name="exclude" value="">
