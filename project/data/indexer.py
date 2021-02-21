@@ -37,6 +37,9 @@ class Indexer:
         return [self._wnl.lemmatize(token.strip("'")) for token in self._token_re.findall(text.lower())
                 if token.strip("'") and token.strip("'") not in self._stopwords]
 
+#    def index_recipe(self, recipe_obj):
+#        return
+
     def construct_index(self, dataset_num_limit=None):
         start_time = datetime.now()
         filenames = os.listdir(self._RAW_DATA_DIR)[:dataset_num_limit]

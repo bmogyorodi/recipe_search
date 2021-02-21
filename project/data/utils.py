@@ -30,6 +30,8 @@ def parse_ingredient_quantity(quantity):
 
 
 def parse_nutrient(nutrient):
+    if nutrient is None:
+        return None
     try:
         f = float(nutrient)
         return f if f > 0 else None
@@ -66,7 +68,10 @@ def parse_title(title, max_length):
 
 def parse_total_time(total_time):
     if isinstance(total_time, int):
-        return total_time
+        if total_time == 0:
+            return None
+        else:
+            return total_time
     elif isinstance(total_time, str):
         re_str = r"((?P<hours>\d+) hour(s)?)?( )?((?P<minutes>\d+) minute(s)?)?(,)?.*"
         m = re.match(re_str, total_time)
