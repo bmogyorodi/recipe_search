@@ -9,7 +9,7 @@ class Token(CleanableModel):
     """
     Tokens appearing within the Index
     """
-    title = models.CharField(max_length=127)
+    title = models.CharField(max_length=127, unique=True)
     recipes = models.ManyToManyField(
         "Recipe",
         through="RecipeToken",

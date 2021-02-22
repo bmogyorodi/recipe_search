@@ -3,6 +3,7 @@ from pathlib import Path
 import pickle
 import bz2
 import os
+import time
 from data.models import Recipe
 
 
@@ -22,11 +23,21 @@ class DataLoader():
     def _import_dataset(self, filename):
         source = filename.split(".")[0]
         recipes = self._load_datafile(filename)["recipes"]
+        start_time = time.time()
 
+        print("------------------------------------")
+        print(f"Indexing {source}")
+        print("------------------------------------")
+        print(f"Recipes already indexed: {len(Recipe.objects.filter(source=source))}")
+        print(f"New recipes to index:    {len(recipes) - len(Recipe.objects.filter(source=source))}")
+        print()
+
+        count = 0
         for source_id, recipe in recipes.items():
             # If recipe is not already in the database, add it
             if len(recipe["ingredients"]) > 0 and len(recipe["instructions"]) > 0 \
                and not Recipe.objects.filter(source=source, source_id=source_id):
+
                 recipe_obj = Recipe(title=recipe["title"],
                                     canonical_url=recipe["canonical_url"],
                                     image=recipe["image"],
@@ -38,13 +49,19 @@ class DataLoader():
                                     yields=recipe.get("yields", ""),
                                     **recipe.get("nutrients", {}))
                 recipe_obj.save()
-            # self.indexer.index_recipe(recipe_obj)
+
+                recipe_text = {
+                    "title": recipe["title"],
+                    "ingredients": " ".join(recipe["ingredients"]),
+                    "instructions": recipe["instructions"],
+                    "author": recipe["author"]
+                }
+                self.indexer.index_recipe(recipe_obj, recipe_text)
+
+                count += 1
+                print(f"Imported {count} recipes | Total Time: {time.time() - start_time:.2f}s | Current recipe ID: {source_id}", "\033[K", end="\r", flush=True)
+        print("\n\n")
 
     def _load_datafile(self, filename):
         with bz2.BZ2File(self._RAW_DATA_DIR / filename, "rb") as f:
             return pickle.load(f)
-
-
-if __name__ == "__main__":
-    data_loader = DataLoader(files_to_load=["acouplecooks.pbz2"])
-    data_loader.import_datasets()
