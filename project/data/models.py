@@ -160,3 +160,16 @@ class Recipe(CleanableModel):
 
     def __str__(self):
         return self.title
+
+
+class Source(models.Model):
+    """
+    Model containing information about sources (ID, Name, URL, Favicon URL)
+    """
+    source_id = models.CharField(max_length=32, primary_key=True)
+    title = models.CharField(max_length=128)
+    url = models.CharField(max_length=128)
+    favicon = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.title

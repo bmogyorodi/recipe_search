@@ -4,11 +4,12 @@ import pickle
 import bz2
 import os
 import time
-from data.models import Recipe
+from data.models import Recipe, Source
 
 
 class DataLoader():
     _RAW_DATA_DIR = Path(__file__).parent.resolve() / "data"
+    SOURCE_INFO_FILENAME = "sources.psv"
 
     def __init__(self, files_to_load=None):
         self.indexer = Indexer()
@@ -65,3 +66,13 @@ class DataLoader():
     def _load_datafile(self, filename):
         with bz2.BZ2File(self._RAW_DATA_DIR / filename, "rb") as f:
             return pickle.load(f)
+
+    def import_source_information(self):
+        with open(self._RAW_DATA_DIR / self.SOURCE_INFO_FILENAME, "r") as f:
+            f.readline()  # Skip header row
+            count = 0
+            for line in f:
+                count += 1
+                source_id, source_name, source_url, favicon_url = line.split("|")
+                Source.objects.get_or_create(source_id=source_id, title=source_name, url=source_url, favicon=favicon_url)
+        print(f"Imported information about {count} sources")
