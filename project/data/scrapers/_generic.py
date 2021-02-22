@@ -44,6 +44,8 @@ class Scraper():
     WILD_MODE = False
     # In case we need to hotfix a class from recipe_scrapers
     RECIPE_SCRAPER_CLASS = None
+    # Request headers
+    REQUEST_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:77.0) Gecko/20190101 Firefox/77.0"}
 
     def __init__(self):
         # If data dir doesn't exist, create it
@@ -217,7 +219,7 @@ class SitemapScraper(Scraper):
         'url' is a parameter because it's used in RootSitemapScraper
         """
         r = re.compile(self.RECIPE_URL_RE)
-        res = requests.get(url)
+        res = requests.get(url, headers=self.REQUEST_HEADERS)
         try:
             root = ET.fromstring(res.content)
         except ET.ParseError:
@@ -273,7 +275,7 @@ class RootSitemapScraper(SitemapScraper):
         Retrieves a list of sitemap URLs for the given root sitemap
         """
         r = re.compile(self.SITEMAP_URL_RE)
-        res = requests.get(self.SITEMAPS_ROOT_URL)
+        res = requests.get(self.SITEMAPS_ROOT_URL, headers=self.REQUEST_HEADERS)
         try:
             root = ET.fromstring(res.content)
         except ET.ParseError:
