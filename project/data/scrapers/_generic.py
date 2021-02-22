@@ -65,7 +65,7 @@ class Scraper():
         if self.RECIPE_SCRAPER_CLASS:
             scraper = self.RECIPE_SCRAPER_CLASS(url)
         else:
-            scraper = scrape_me(url)
+            scraper = scrape_me(url, wild_mode=self.WILD_MODE)
 
         # Empty title means HTTP 404 or e.g. category/recipe list
         if scraper.title() is None or scraper.title() == "":
