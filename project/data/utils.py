@@ -52,6 +52,8 @@ def truncate(string, length):
 
 
 def parse_html_text(text):
+    if text is None:
+        return ""
     text = re.sub(r"<!--.*-->", "", text)  # Remove HTML comments
     # Convert HTML entities to Unicode chars
     text = html.unescape(text.replace("&amp;", "&"))
