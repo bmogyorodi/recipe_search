@@ -26,16 +26,18 @@ class DataLoader():
         recipes = self._load_datafile(filename)["recipes"]
         start_time = time.time()
 
+        already_indexed = set(r.source_id for r in Recipe.objects.filter(source=source))
+
         print("------------------------------------")
         print(f"Indexing {source}")
         print("------------------------------------")
-        print(f"Recipes already indexed: {len(Recipe.objects.filter(source=source))}")
-        print(f"New recipes to index:    {len(recipes) - len(Recipe.objects.filter(source=source))}")
-        print()
+        print(f"Recipes already indexed: {len(already_indexed)}")
+        print(f"New recipes to index:    {len(recipes) - len(already_indexed)}\n")
 
         count = 0
-        for source_id, recipe in recipes.items():
+        for source_id in recipes.keys() - already_indexed:
             # If recipe is not already in the database, add it
+            recipe = recipes[source_id]
             if len(recipe["ingredients"]) > 0 and len(recipe["instructions"]) > 0 \
                and not Recipe.objects.filter(source=source, source_id=source_id):
 
@@ -55,12 +57,16 @@ class DataLoader():
                     "title": recipe["title"],
                     "ingredients": " ".join(recipe["ingredients"]),
                     "instructions": recipe["instructions"],
-                    "author": recipe["author"]
+                    "author": recipe["author"] if recipe["author"] is not None else ""
                 }
                 self.indexer.index_recipe(recipe_obj, recipe_text)
 
                 count += 1
-                print(f"Imported {count} recipes | Total Time: {time.time() - start_time:.2f}s | Current recipe ID: {source_id}", "\033[K", end="\r", flush=True)
+                total_time = time.time() - start_time
+                print(f" Imported {count} recipes |"
+                      f" Total Time: {total_time:.2f}s |"
+                      f" Average Time: {total_time / count:.2f}s |"
+                      f" Current recipe ID: {source_id}", "\033[K", end="\r", flush=True)
         print("\n\n")
 
     def _load_datafile(self, filename):

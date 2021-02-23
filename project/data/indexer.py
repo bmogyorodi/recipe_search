@@ -19,13 +19,15 @@ class Indexer:
 
     def index_recipe(self, recipe_obj, recipe_text):
         pos = 0
+        recipetokens = []
         for text_part, text in recipe_text.items():
             tokens = self._preprocess_text(text)
             token_type = self.text_part_to_int[text_part]
             for token in tokens:
                 pos += 1
                 token_obj, created = Token.objects.get_or_create(title=token)
-                RecipeToken.objects.create(token=token_obj,
-                                           recipe=recipe_obj,
-                                           position=pos,
-                                           token_type=token_type)
+                recipetokens.append(RecipeToken(token=token_obj,
+                                                recipe=recipe_obj,
+                                                position=pos,
+                                                token_type=token_type))
+        RecipeToken.objects.bulk_create(recipetokens)
