@@ -4,7 +4,7 @@
   <div class="row">
     <div class="col-md-11 p-1">
       <form id="searchForm" action="/" method="get" class="input-group input-group-lg">
-          <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe" value={{ search_params.search_exp }}>
+          <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe" value="{{ search_params.search_exp }}">
           <input type="hidden" id="IncludeListInput" name="include" value="">
           <input type="hidden" id="ExcludeListInput" name="exclude" value="">
           <div class="input-group-append">
@@ -70,11 +70,6 @@
     </div>
   </div>
 </div>
-<datalist id="ingredientlist">
-  {% for results in ingredients %}
-         <option value="{{ results}}">
-  {% endfor %}
-     </datalist>
 
 <!-- All Possible Ingredients -->
 <datalist id="IngredientList">
