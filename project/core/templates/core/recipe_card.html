@@ -6,7 +6,7 @@
   <div class="row no-gutters">
   <a href="{{ recipe.canonical_url }}" target="_blank" class="stretched-link"></a>
     <div class="img-col col-md-2">
-      {% if recipe.image %}
+      {% if recipe.image and recipe.image != ""%}
         <img src="{{ recipe.image }}" class="card-img" alt="{{ recipe.title }}">
       {% else %}
         <img src="{% static 'img/recipe_default.png' %}" class="card-img" alt="{{ recipe.title }}">

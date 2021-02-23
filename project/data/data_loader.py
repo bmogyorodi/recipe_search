@@ -47,7 +47,7 @@ class DataLoader():
 
                 recipe_obj = Recipe(title=recipe["title"],
                                     canonical_url=recipe["canonical_url"],
-                                    image=recipe["image"],
+                                    image=recipe["image"] if recipe["image"] is not None else "",
                                     author=recipe["author"],
                                     source=source,
                                     source_id=source_id,
