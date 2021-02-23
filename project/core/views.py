@@ -56,6 +56,8 @@ sample_recipes = [
 
 sample_ingredients = ["Chicken", "Tomato", "Garlic", "Cheddar", "Salt", "Pepper", "Plain Flour"]
 
+sample_tags = ["Spanish", "Greek", "Italian", "Mexican", "British", "Polish", "German"]
+
 
 def home(request):
     search_exp = request.GET.get("q", default="").replace("+", " ")
@@ -94,6 +96,7 @@ def home(request):
     context = {
         "page": page,
         "ingredients": sample_ingredients,
+        "tags": sample_tags,
         "search_params": {
             "search_exp": search_exp,
             "included_ingr": included_ingr,

@@ -12,6 +12,9 @@
   {% endblock search_box %}
 </div>
 <div id="searchResults">
+    {% block filters %}
+      {% include 'core/filters.html' %}
+    {% endblock filters %}
     <div id="searchResultsContainer" class="container py-4">
       <div class="card-column">
         {% for recipe in page %}
