@@ -4,9 +4,7 @@
 
 <div id="filters" class="container pt-4">
  {% for tag in tags %}
-   <button id="{{ tag }}Filter" }}" type="button" class="btn btn-outline-secondary rounded-pill mr-1">
-     {{ tag }}
-   </button>
+   <button id="{{ tag }}Filter" type="button" class="btn btn-outline-secondary rounded-pill mr-1">{{ tag }}</button>
  {% endfor %}
 </div>
 
