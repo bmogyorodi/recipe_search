@@ -19,7 +19,11 @@ class DataLoader():
 
     def import_datasets(self):
         for filename in self.filenames:
-            self._import_dataset(filename)
+            try:
+                self._import_dataset(filename)
+            except KeyboardInterrupt:
+                print("\nStopping...")
+                return
 
     def _import_dataset(self, filename):
         source = filename.split(".")[0]
