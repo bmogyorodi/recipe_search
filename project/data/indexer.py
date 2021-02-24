@@ -7,10 +7,26 @@ from .models import Token, RecipeToken
 
 class Indexer:
     def __init__(self):
-        self._stopwords = stopwords.words('english')
         self._token_re = re.compile(r'[a-z\']+')
-        self._wnl = WordNetLemmatizer()
-        self.text_part_to_int = {"title": 1, "author": 2, "instructions": 3, "ingredients": 4}
+        # Download "stopwords" if not available
+        try:
+            stopwords.words('english')
+        except LookupError:
+            import nltk
+            nltk.download("stopwords")
+        finally:
+            self._stopwords = stopwords.words('english')
+        # Download "wordnet" if not available
+        try:
+            WordNetLemmatizer().lemmatize("fail?")
+        except LookupError:
+            import nltk
+            nltk.download("wordnet")
+        finally:
+            self._wnl = WordNetLemmatizer()
+
+        self.text_part_to_int = {
+            "title": 1, "author": 2, "instructions": 3, "ingredients": 4}
 
     def _preprocess_text(self, text):
         text = html.unescape(text.replace('&amp;', '&'))
