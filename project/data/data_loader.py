@@ -45,6 +45,11 @@ class DataLoader():
             if len(recipe["ingredients"]) > 0 and len(recipe["instructions"]) > 0 \
                and not Recipe.objects.filter(source=source, source_id=source_id):
 
+                # Remove empty "value" attribute in nutrients if it exists
+                nutrients = recipe.get("nutrients", {})
+                if "value" in nutrients:
+                    del nutrients["value"]
+
                 recipe_obj = Recipe(title=recipe["title"],
                                     canonical_url=recipe["canonical_url"],
                                     image=recipe["image"] if recipe["image"] is not None else "",
@@ -54,7 +59,7 @@ class DataLoader():
                                     ratings=recipe.get("ratings", -1),
                                     total_time=recipe.get("total_time", 0),
                                     yields=recipe.get("yields", ""),
-                                    **recipe.get("nutrients", {}))
+                                    **nutrients)
                 recipe_obj.save()
 
                 recipe_text = {
