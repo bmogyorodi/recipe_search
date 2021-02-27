@@ -85,3 +85,13 @@ def parse_total_time(total_time):
             return None
     else:
         return None
+
+def preprocess_ingredient_string(ingredient):
+    pattern = re.compile('[\W_]+')
+    pattern.sub('', ingredient)
+    ingredient = ingredient.lower()
+    ingredient = ingredient.replace('tsp', 'teaspoons')
+    ingredient = ingredient.replace('tbsp', 'tablespoons')
+    ingredient = ingredient.replace('oz', 'ounces')
+    ingredient = ingredient.replace('kg', 'g')
+    return [ingredient]
