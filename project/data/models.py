@@ -131,10 +131,11 @@ class Recipe(CleanableModel):
     def clean(self, *args, **kwargs):
         # Rating must be in range [0, 5]
         # If rating is within [5, 100] divide by 20, otherwise if out of range set null
-        if self.ratings > self.RATINGS_MAX and self.ratings <= 100:
-            self.ratings /= 20
-        elif self.ratings > self.RATINGS_MAX or self.ratings < self.RATINGS_MIN:
-            self.ratings = None
+        if self.ratings is not None:
+            if self.ratings > self.RATINGS_MAX and self.ratings <= 100:
+                self.ratings /= 20
+            elif self.ratings > self.RATINGS_MAX or self.ratings < self.RATINGS_MIN:
+                self.ratings = None
         # Truncate and escape title and author to their max length
         self.title = parse_title(self.title, 127)
         self.author = truncate(parse_html_text(self.author), 127)
