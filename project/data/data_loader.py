@@ -4,6 +4,7 @@ import pickle
 import bz2
 import os
 import time
+from datetime import timedelta
 from data.models import Recipe, Source
 
 
@@ -13,9 +14,11 @@ class DataLoader():
 
     def __init__(self, files_to_load=None):
         self.indexer = Indexer()
-        self.filenames = [fn for fn in os.listdir(self._RAW_DATA_DIR) if fn.split(".")[-1] == "pbz2"]
+        self.filenames = [fn for fn in os.listdir(
+            self._RAW_DATA_DIR) if fn.split(".")[-1] == "pbz2"]
         if files_to_load is not None:
-            self.filenames = [fn for fn in self.filenames if fn in files_to_load]
+            self.filenames = [
+                fn for fn in self.filenames if fn in files_to_load]
 
     def import_datasets(self):
         for filename in self.filenames:
@@ -30,13 +33,15 @@ class DataLoader():
         recipes = self._load_datafile(filename)["recipes"]
         start_time = time.time()
 
-        already_indexed = set(r.source_id for r in Recipe.objects.filter(source=source))
+        already_indexed = set(
+            r.source_id for r in Recipe.objects.filter(source=source))
+        total_to_index = len(recipes) - len(already_indexed)
 
         print("------------------------------------")
         print(f"Indexing {source}")
         print("------------------------------------")
         print(f"Recipes already indexed: {len(already_indexed)}")
-        print(f"New recipes to index:    {len(recipes) - len(already_indexed)}\n")
+        print(f"New recipes to index:    {total_to_index}\n")
 
         count = 0
         for source_id in recipes.keys() - already_indexed:
@@ -66,10 +71,17 @@ class DataLoader():
 
                 count += 1
                 total_time = time.time() - start_time
-                print(f" Imported {count} recipes |"
-                      f" Total Time: {total_time:.2f}s |"
-                      f" Average Time: {total_time / count:.2f}s |"
-                      f" Current recipe ID: {source_id}", "\033[K", end="\r", flush=True)
+                remaining = total_to_index - count
+                average = total_time / count
+                total = timedelta(seconds=round(total_time))
+                estimated = timedelta(
+                    seconds=round(remaining * average))
+                print(f" Imported {count} |"
+                      f" Remaining {remaining} |"
+                      f" Total: {total} |"
+                      f" Average/recipe: {average:.2f}s |"
+                      f" Estimated: {estimated} |"
+                      f" Current ID: {source_id}", "\033[K", end="\r", flush=True)
         print("\n\n")
 
     def _load_datafile(self, filename):
@@ -82,6 +94,8 @@ class DataLoader():
             count = 0
             for line in f:
                 count += 1
-                source_id, source_name, source_url, favicon_url = line.split("|")
-                Source.objects.get_or_create(source_id=source_id, title=source_name, url=source_url, favicon=favicon_url)
+                source_id, source_name, source_url, favicon_url = line.split(
+                    "|")
+                Source.objects.get_or_create(
+                    source_id=source_id, title=source_name, url=source_url, favicon=favicon_url)
         print(f"Imported information about {count} sources")
