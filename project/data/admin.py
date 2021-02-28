@@ -22,14 +22,22 @@ class IngredientAdmin(admin.ModelAdmin):
     def get_num_recipes(self, obj):
         return obj.num_recipes
     get_num_recipes.admin_order_field = 'num_recipes'
+    get_num_recipes.short_description = '# of recipes'
 
 
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
-    list_display = ("title", "num_recipes")
+    list_display = ("title", "get_num_recipe_tokens")
 
-    def num_recipes(self, obj):
-        return obj.recipes.count()
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(num_recipe_tokens=Count("recipes"))
+        return qs
+
+    def get_num_recipe_tokens(self, obj):
+        return obj.num_recipe_tokens
+    get_num_recipe_tokens.admin_order_field = 'num_recipe_tokens'
+    get_num_recipe_tokens.short_description = '# of recipe tokens'
 
 
 @admin.register(Tag)
@@ -44,6 +52,7 @@ class TagAdmin(admin.ModelAdmin):
     def get_num_recipes(self, obj):
         return obj.num_recipes
     get_num_recipes.admin_order_field = 'num_recipes'
+    get_num_recipes.short_description = '# of recipes'
 
 
 @admin.register(Source)
