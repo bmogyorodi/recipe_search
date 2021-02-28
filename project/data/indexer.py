@@ -2,7 +2,7 @@ import re
 import html
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
-from .models import (Token, RecipeToken, Ingredient, RecipeIngredient)
+from .models import (Token, RecipeToken, Ingredient, RecipeIngredient, Tag)
 from .utils import (parse_ingredients, preprocess_ingredient_string,
                     parse_ingredient_quantity)
 
@@ -62,6 +62,11 @@ class Indexer:
                                  quantity=quantity,
                                  unit=parsed_ing.get("unit") or ""))
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
+
+        # Create Tags
+        for tag_title in map(
+                str.strip, recipe.get("cuisine", "").lower().split(",")):
+            recipe_obj.tags.add(Tag.objects.get_or_create(title=tag_title)[0])
 
         # Create RecipeTokens
         recipe_token = []

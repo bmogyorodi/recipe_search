@@ -34,7 +34,16 @@ class TokenAdmin(admin.ModelAdmin):
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):
-    list_display = ("title", )
+    list_display = ("title", "get_num_recipes")
+
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        qs = qs.annotate(num_recipes=Count("recipe"))
+        return qs
+
+    def get_num_recipes(self, obj):
+        return obj.num_recipes
+    get_num_recipes.admin_order_field = 'num_recipes'
 
 
 @admin.register(Source)
