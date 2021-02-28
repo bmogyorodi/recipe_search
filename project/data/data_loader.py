@@ -62,13 +62,7 @@ class DataLoader():
                                     **nutrients)
                 recipe_obj.save()
 
-                recipe_text = {
-                    "title": recipe["title"],
-                    "ingredients": " ".join(recipe["ingredients"]),
-                    "instructions": recipe["instructions"],
-                    "author": recipe["author"] if recipe["author"] is not None else ""
-                }
-                self.indexer.index_recipe(recipe_obj, recipe_text)
+                self.indexer.index_recipe(recipe_obj, recipe)
 
                 count += 1
                 total_time = time.time() - start_time
