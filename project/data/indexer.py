@@ -66,6 +66,9 @@ class Indexer:
         # Create Tags
         for tag_title in map(
                 str.strip, recipe.get("cuisine", "").lower().split(",")):
+            # Don't want the empty string
+            if tag_title == "":
+                continue
             recipe_obj.tags.add(Tag.objects.get_or_create(title=tag_title)[0])
 
         # Create RecipeTokens
