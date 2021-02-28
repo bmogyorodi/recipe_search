@@ -76,9 +76,10 @@ def home(request):
         page_number = request.GET.get('page', default=1)
         page = paginator.get_page(page_number)
     else:
-        start_time = time()
         res = []
+        start_time = time()
         scores = RankedSearch().search(search_exp)
+
         for recipe_id, score in scores[:100]:
             recipe = Recipe.objects.get(id=recipe_id)
             source = Source.objects.get(source_id=recipe.source)
@@ -92,6 +93,8 @@ def home(request):
                 "ingredients": [],
                 "total_time": recipe.total_time
             })
+
+        total_time = time() - start_time
         paginator = Paginator(res, 10)
         page_number = request.GET.get('page', default=1)
         page = paginator.get_page(page_number)
@@ -105,7 +108,7 @@ def home(request):
             "included_ingr": included_ingr,
             "excluded_ingr": excluded_ingr
         },
-        "time": time() - start_time,
+        "time": total_time,
         "result_count": len(res)
     }
 
