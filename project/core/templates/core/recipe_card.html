@@ -1,12 +1,13 @@
 {% block recipe_card %}
 
+{% load utils %}
 {% load static %}
 
 <div class="card-block card rec-card mb-3">
   <div class="row no-gutters">
   <a href="{{ recipe.canonical_url }}" target="_blank" class="stretched-link"></a>
     <div class="img-col col-md-2">
-      {% if recipe.image and recipe.image != ""%}
+      {% if recipe.image and recipe.image != "" %}
         <img src="{{ recipe.image }}" class="card-img" alt="{{ recipe.title }}">
       {% else %}
         <img src="{% static 'img/recipe_default.png' %}" class="card-img" alt="{{ recipe.title }}">
@@ -27,11 +28,13 @@
             </ul>
             {% if recipe.ratings %}
               <p class="star-rating">
-                <span class="fas fa-star {% if recipe.ratings >= 1 %} checked {% endif %}"></span>
-                <span class="fas fa-star {% if recipe.ratings >= 2 %} checked {% endif %}"></span>
-                <span class="fas fa-star {% if recipe.ratings >= 3 %} checked {% endif %}"></span>
-                <span class="fas fa-star {% if recipe.ratings >= 4 %} checked {% endif %}"></span>
-                <span class="fas fa-star {% if recipe.ratings >= 5 %} checked {% endif %}"></span>
+                {% with round_rating=recipe.ratings|round_number %}
+                  <span class="fas fa-star {% if round_rating >= 1 %} checked {% endif %}"></span>
+                  <span class="fas fa-star {% if round_rating >= 2 %} checked {% endif %}"></span>
+                  <span class="fas fa-star {% if round_rating >= 3 %} checked {% endif %}"></span>
+                  <span class="fas fa-star {% if round_rating >= 4 %} checked {% endif %}"></span>
+                  <span class="fas fa-star {% if round_rating >= 5 %} checked {% endif %}"></span>
+                {% endwith %}
               </p>
             {% endif %}
         </p>

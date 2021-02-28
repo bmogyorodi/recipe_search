@@ -5,6 +5,8 @@ from data.models import Recipe
 from data.models import Source
 from data.search import RankedSearch
 
+from time import time
+
 
 sample_recipes = [
     {
@@ -74,6 +76,7 @@ def home(request):
         page_number = request.GET.get('page', default=1)
         page = paginator.get_page(page_number)
     else:
+        start_time = time()
         res = []
         scores = RankedSearch().search(search_exp)
         for recipe_id, score in scores[:100]:
@@ -83,7 +86,7 @@ def home(request):
                 "title": recipe.title,
                 "source_name": source.title,
                 "source_favicon": source.favicon,
-                "ratings": round(recipe.ratings) if recipe.ratings is not None else None,
+                "ratings": recipe.ratings,
                 "image": recipe.image,
                 "canonical_url": recipe.canonical_url,
                 "ingredients": [],
@@ -101,7 +104,9 @@ def home(request):
             "search_exp": search_exp,
             "included_ingr": included_ingr,
             "excluded_ingr": excluded_ingr
-        }
+        },
+        "time": time() - start_time,
+        "result_count": len(res)
     }
 
     return render(request, 'core/index.html', context)
