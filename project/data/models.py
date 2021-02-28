@@ -110,7 +110,6 @@ class Recipe(CleanableModel):
     # This can vary from "6 serving(s) to "3 dozen kolacky", so string
     yields = models.CharField(max_length=64, blank=True)
 
-    # TODO: split cuisines on ",", strip, lowercase, create models
     tags = models.ManyToManyField(
         "Tag",
         related_name="recipes",
