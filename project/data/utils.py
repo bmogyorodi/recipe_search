@@ -21,6 +21,8 @@ def parse_ingredient_quantity(quantity):
     try:
         f = float(quantity)
         return f if f > 0 else None
+    except TypeError:  # quantity is None
+        return None
     except:
         r = re.compile(r".*(\d+)\s*/\s*(\d+).*")
         m = r.match(quantity)
@@ -86,6 +88,7 @@ def parse_total_time(total_time):
     else:
         return None
 
+
 def preprocess_ingredient_string(ingredient):
     pattern = re.compile('[\W_]+')
     pattern.sub('', ingredient)
@@ -94,4 +97,4 @@ def preprocess_ingredient_string(ingredient):
     ingredient = ingredient.replace('tbsp', 'tablespoons')
     ingredient = ingredient.replace('oz', 'ounces')
     ingredient = ingredient.replace('kg', 'g')
-    return [ingredient]
+    return ingredient
