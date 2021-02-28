@@ -65,7 +65,8 @@ class Indexer:
 
         # Create Tags
         for tag_title in map(
-                str.strip, recipe.get("cuisine", "").lower().split(",")):
+                str.strip,
+                (recipe.get("cuisine", "") or "").lower().split(",")):
             # Don't want the empty string
             if tag_title == "":
                 continue
