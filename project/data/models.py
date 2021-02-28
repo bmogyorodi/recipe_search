@@ -35,6 +35,9 @@ class RecipeToken(models.Model):
     position = models.PositiveIntegerField()
     token_type = models.IntegerField(choices=TokenType.choices)
 
+    class Meta:
+        indexes = [models.Index(fields=["recipe"])]
+
 
 class Tag(CleanableModel):
     title = models.CharField(max_length=64)
