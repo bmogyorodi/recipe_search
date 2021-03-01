@@ -14,6 +14,7 @@ recipe-scrapers = "*"
 requests = "*"
 nltk = "*"
 django-autocomplete-light = "*"
+unidecode = "*"
 ingredient-phrase-tagger = {git = "https://github.com/mtlynch/ingredient-phrase-tagger"}
 
 [requires]

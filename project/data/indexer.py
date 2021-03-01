@@ -2,6 +2,7 @@ import re
 import html
 from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
+import unidecode
 from .models import (Token, RecipeToken, Ingredient, RecipeIngredient, Tag)
 from .utils import (parse_ingredients, preprocess_ingredient_string,
                     parse_ingredient_quantity)
@@ -32,6 +33,7 @@ class Indexer:
 
     def _preprocess_text(self, text):
         text = html.unescape(text.replace('&amp;', '&'))
+        text = unidecode.unidecode(text)  # Replaces â with a, é with e etc.
         return [self._wnl.lemmatize(token.strip("'")) for token in self._token_re.findall(text.lower())
                 if token.strip("'") and token.strip("'") not in self._stopwords]
 
