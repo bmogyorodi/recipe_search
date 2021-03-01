@@ -90,8 +90,15 @@ def parse_total_time(total_time):
 
 
 def preprocess_ingredient_string(ingredient):
-    pattern = re.compile('[\W_]+')
-    pattern.sub('', ingredient)
+    # remove parentheses with contents, Might be unnecessary depending on model performance.
+    pattern_brackets =re.compile('\(.*\)|\{.*\}|\[.*\]')
+    ingredient = pattern_brackets.sub('',ingredient)
+
+    #ingredient = ingredient.split('(')[0]
+    #ingredient = ingredient.split('[')[0]
+    #ingredient = ingredient.split('{')[0]
+    pattern_alphanum = re.compile('[\W_]+')
+    ingredient = pattern_alphanum.sub('', ingredient)
     ingredient = ingredient.lower()
     ingredient = ingredient.replace('tsp', 'teaspoons')
     ingredient = ingredient.replace('tbsp', 'tablespoons')
