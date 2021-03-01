@@ -4,7 +4,7 @@ import subprocess
 import tempfile
 from django.conf import settings
 from ingredient_phrase_tagger.training import utils
-
+import unidecode
 
 def parse_ingredients(input_text):
     with tempfile.NamedTemporaryFile(mode='w') as input_file:
@@ -93,12 +93,12 @@ def preprocess_ingredient_string(ingredient):
     # remove parentheses with contents, Might be unnecessary depending on model performance.
     pattern_brackets =re.compile('\(.*\)|\{.*\}|\[.*\]')
     ingredient = pattern_brackets.sub('',ingredient)
-
     #ingredient = ingredient.split('(')[0]
     #ingredient = ingredient.split('[')[0]
     #ingredient = ingredient.split('{')[0]
-    pattern_alphanum = re.compile('[\W_]+')
+    pattern_alphanum = re.compile('[^\w ]')
     ingredient = pattern_alphanum.sub('', ingredient)
+    ingredient = unidecode.unidecode(ingredient)
     ingredient = ingredient.lower()
     ingredient = ingredient.replace('tsp', 'teaspoons')
     ingredient = ingredient.replace('tbsp', 'tablespoons')
