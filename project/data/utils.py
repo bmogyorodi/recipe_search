@@ -2,9 +2,10 @@ import re
 import html
 import subprocess
 import tempfile
+import unidecode
 from django.conf import settings
 from ingredient_phrase_tagger.training import utils
-import unidecode
+
 
 def parse_ingredients(input_text):
     with tempfile.NamedTemporaryFile(mode='w') as input_file:
@@ -89,19 +90,22 @@ def parse_total_time(total_time):
         return None
 
 
+pattern_nonalphanum = re.compile('[^\w ]')
+pattern_brackets = re.compile('\([^)(]*\)|\{[^}{]*\}|\[[^][]*\]')
+
+
 def preprocess_ingredient_string(ingredient):
-    # remove parentheses with contents, Might be unnecessary depending on model performance.
-    pattern_brackets =re.compile('\(.*\)|\{.*\}|\[.*\]')
-    ingredient = pattern_brackets.sub('',ingredient)
-    #ingredient = ingredient.split('(')[0]
-    #ingredient = ingredient.split('[')[0]
-    #ingredient = ingredient.split('{')[0]
-    pattern_alphanum = re.compile('[^\w ]')
-    ingredient = pattern_alphanum.sub('', ingredient)
+    # Case-fold and remove unicode characters
     ingredient = unidecode.unidecode(ingredient)
     ingredient = ingredient.lower()
+    # Remove parentheses with contents, e.g. (8-oz) steak
+    ingredient = pattern_brackets.sub('', ingredient)
+    # Remove non-alphanumerical characters, e.g. unclosed parentheses
+    ingredient = pattern_nonalphanum.sub('', ingredient)
+    # Replace common shorthands with full words
     ingredient = ingredient.replace('tsp', 'teaspoons')
     ingredient = ingredient.replace('tbsp', 'tablespoons')
     ingredient = ingredient.replace('oz', 'ounces')
-    ingredient = ingredient.replace('kg', 'g')
+    ingredient = ingredient.replace('kg', 'g')  # matches better but wrong
+    # Unnecessary whitespace is dealt with in parse_ingredients
     return ingredient
