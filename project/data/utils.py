@@ -92,10 +92,16 @@ def parse_total_time(total_time):
 
 pattern_nonalphanum = re.compile('[^\w ]')
 pattern_brackets = re.compile('\([^)(]*\)|\{[^}{]*\}|\[[^][]*\]')
-
+pattern_unicode_fractions = re.compile(
+                            """\u00BC|\u00BD|\u00BE|
+                            \u2150|\u2151|\u2152|\u2153|
+                            \u2154|\u2155|\u2156|\u2157|
+                            \u2158|\u2159|\u215A|\u215B|
+                            \u215C|\u215D|\u215E|\u215F""")
 
 def preprocess_ingredient_string(ingredient):
     # Case-fold and remove unicode characters
+    ingredient = pattern_unicode_fractions.sub('', ingredient)
     ingredient = unidecode.unidecode(ingredient)
     ingredient = ingredient.lower()
     # Remove parentheses with contents, e.g. (8-oz) steak
