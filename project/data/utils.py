@@ -123,3 +123,22 @@ def preprocess_ingredient_string(ingredient):
     ingredient = ingredient.replace('kg', 'g')  # matches better but wrong
     # Unnecessary whitespace is dealt with in parse_ingredients
     return ingredient
+
+
+tag_separator = re.compile(r",|\/")
+tag_remove = re.compile(r"inspired|styled?|n\/a|https?[^\s]+")
+
+
+def preprocess_tags(tags):
+    if tags is None:
+        return []
+    # Case-fold and remove parentheses, e.g. "vegan (plant based)" -> "vegan "
+    tags = pattern_brackets.sub("", tags.lower())
+    # Replace "-" with spaces, e.g. "spanish-inspired" -> "spanish inspired"
+    tags = tags.replace("-", " ")
+    # Remove redundant words like "inspired", or empty tag "n/a"
+    tags = tag_remove.sub("", tags)
+    # Split on ',' and '/' and strip whitespace
+    tags = map(str.strip, tag_separator.split(tags))
+    # Filter out empty strings, potentially cause by removing some tags
+    return [t for t in tags if t != ""]

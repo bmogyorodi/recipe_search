@@ -5,7 +5,7 @@ from nltk.corpus import stopwords
 import unidecode
 from .models import (Token, RecipeToken, Ingredient, RecipeIngredient, Tag)
 from .utils import (parse_ingredients, preprocess_ingredient_string,
-                    parse_ingredient_quantity)
+                    preprocess_tags)
 
 
 class Indexer:
@@ -62,12 +62,7 @@ class Indexer:
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
         # Create Tags
-        for tag_title in map(
-                str.strip,
-                (recipe.get("cuisine", "") or "").lower().split(",")):
-            # Don't want the empty string
-            if tag_title == "":
-                continue
+        for tag_title in preprocess_tags(recipe.get("cuisine")):
             recipe_obj.tags.add(Tag.objects.get_or_create(title=tag_title)[0])
 
         # Create RecipeTokens
