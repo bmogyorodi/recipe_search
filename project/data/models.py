@@ -71,7 +71,7 @@ class RecipeIngredient(models.Model):
 class Recipe(CleanableModel):
     """
     Model containing displayed information about a recipe as well as metadata.
-    The tuple (source, source_id) uniquely corresponds to original raw source.
+    The tuple (source, source_raw_id) uniquely corresponds to original raw source.
     """
 
     RATINGS_MAX = 5.0
@@ -86,10 +86,14 @@ class Recipe(CleanableModel):
     image = models.TextField(blank=True)
     author = models.CharField(max_length=127, blank=True)
 
-    # e.g. "ambitiouskitchen"
-    source = models.CharField(max_length=50)
+    # e.g. Source(source_id="ambitiouskitchen")
+    source = models.ForeignKey(
+        "Source", on_delete=models.CASCADE,
+        related_name="recipes",
+        related_query_name="recipe")
     # Maximum length is 169 so far so hopefully shouldn't cause problems
-    source_id = models.CharField(max_length=255)
+    # "source_id" clashes with "source"
+    source_raw_id = models.CharField(max_length=255)
 
     ingredients = models.ManyToManyField(
         "Ingredient", through="RecipeIngredient",

@@ -29,12 +29,16 @@ class DataLoader():
                 return
 
     def _import_dataset(self, filename):
-        source = filename.split(".")[0]
+        # Make sure Source information has been loaded
+        if Source.objects.count() == 0:
+            self.import_source_information()
+        # If source doesn't exist, correctly crashes
+        source = Source.objects.get(source_id=filename.split(".")[0])
         recipes = self._load_datafile(filename)["recipes"]
         start_time = time.time()
 
-        already_indexed = set(
-            r.source_id for r in Recipe.objects.filter(source=source))
+        already_indexed = set(Recipe.objects.filter(
+            source=source).values_list("source_raw_id", flat=True))
         total_to_index = len(recipes) - len(already_indexed)
 
         print("------------------------------------")
@@ -47,9 +51,10 @@ class DataLoader():
         for source_id in recipes.keys() - already_indexed:
             # If recipe is not already in the database, add it
             recipe = recipes[source_id]
-            if len(recipe["ingredients"]) > 0 and len(recipe["instructions"]) > 0 \
-               and not Recipe.objects.filter(source=source, source_id=source_id):
-
+            if (
+                len(recipe["ingredients"]) > 0 and
+                len(recipe["instructions"]) > 0
+            ):
                 # Remove empty "value" attribute in nutrients if it exists
                 nutrients = recipe.get("nutrients", {})
                 if "value" in nutrients:
@@ -60,7 +65,7 @@ class DataLoader():
                                     image=recipe["image"] if recipe["image"] is not None else "",
                                     author=recipe["author"],
                                     source=source,
-                                    source_id=source_id,
+                                    source_raw_id=source_id,
                                     ratings=recipe.get("ratings", -1),
                                     total_time=recipe.get("total_time", 0),
                                     yields=recipe.get("yields", ""),
