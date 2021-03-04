@@ -104,7 +104,6 @@ qty_unit = f"{qty_or_range}\s*{unit}"        # including a string unit
 alternate_or_single_amount = re.compile(     # e.g. "20-50 ml/4-10 1/8 tsp"
     f"({qty_unit}\s*\/\s*{qty_unit}|{qty_unit})")
 
-
 def preprocess_ingredient_string(ingredient):
     # Case-fold and remove unicode characters
     ingredient = pattern_unicode_fractions.sub('', ingredient)
@@ -113,7 +112,7 @@ def preprocess_ingredient_string(ingredient):
     # Remove parentheses with contents, e.g. (8-oz) steak
     ingredient = pattern_brackets.sub('', ingredient)
     # Essentially remove any possible unit, incl. ranges, mixed fractions, etc.
-    ingredient = alternate_or_single_amount.sub('', ingredient)
+    # ingredient = alternate_or_single_amount.sub('', ingredient)
     # Remove non-alphanumerical characters, e.g. unclosed parentheses
     ingredient = pattern_nonalphanum.sub('', ingredient)
     # Replace common shorthands with full words
