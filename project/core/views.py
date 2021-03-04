@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
+from django.db.models import When, Case, DecimalField
 
-from data.models import Recipe
-from data.models import Source
+from data.models import Recipe, Source
 from data.search import RankedSearch
 
 from time import time
@@ -56,9 +56,11 @@ sample_recipes = [
     }
 ]
 
-sample_ingredients = ["Chicken", "Tomato", "Garlic", "Cheddar", "Salt", "Pepper", "Plain Flour"]
+sample_ingredients = ["Chicken", "Tomato", "Garlic",
+                      "Cheddar", "Salt", "Pepper", "Plain Flour"]
 
-sample_tags = ["Spanish", "Greek", "Italian", "Mexican", "British", "Polish", "German"]
+sample_tags = ["Spanish", "Greek", "Italian",
+               "Mexican", "British", "Polish", "German"]
 
 
 def home(request):
@@ -66,38 +68,43 @@ def home(request):
     use_fake_data = request.GET.get("fake_data", default="False")
 
     included_ingr_str = request.GET.get("include", default="")
-    included_ingr = [] if included_ingr_str == "" else included_ingr_str.split(",")
+    included_ingr = [] if included_ingr_str == "" else included_ingr_str.split(
+        ",")
 
     excluded_ingr_str = request.GET.get("exclude", default="")
-    excluded_ingr = [] if excluded_ingr_str == "" else excluded_ingr_str.split(",")
+    excluded_ingr = [] if excluded_ingr_str == "" else excluded_ingr_str.split(
+        ",")
 
+    total_time = None
+    res = []
     if use_fake_data == "True":
         paginator = Paginator(sample_recipes, 2)
-        page_number = request.GET.get('page', default=1)
-        page = paginator.get_page(page_number)
-    else:
-        res = []
-        start_time = time()
+    elif len(search_exp) > 0:
+        t_start = time()
         scores = RankedSearch().search(search_exp)
+        t_retrieval = time()
 
-        for recipe_id, score in scores[:100]:
-            recipe = Recipe.objects.get(id=recipe_id)
-            source = Source.objects.get(source_id=recipe.source)
-            res.append({
-                "title": recipe.title,
-                "source_name": source.title,
-                "source_favicon": source.favicon,
-                "ratings": recipe.ratings,
-                "image": recipe.image,
-                "canonical_url": recipe.canonical_url,
-                "ingredients": [],
-                "total_time": recipe.total_time
-            })
+        # Obtain retrieved recipes, annotate with score, and order by it
+        pks = [recipe_id for recipe_id, _ in scores[:100]]
+        for pk in pks:
+            res.append(Recipe.objects.get(pk=pk))
+        # ? another way to order but takes 0.6s instead of 0.2s
+        # whens = [When(pk=k, then=v) for k, v in scores]
+        # res = Recipe.objects.filter(pk__in=pks).annotate(
+        #     score=Case(*whens, default=0, output_field=DecimalField())
+        # ).order_by('-score')
 
-        total_time = time() - start_time
+        t_data = time()
+
+        total_time = (f"Retrieval: {t_retrieval - t_start:.4f}, "
+                      f"Processing: {t_data -t_retrieval:.4f}, "
+                      f"Total: {time() - t_start:.4f}")
         paginator = Paginator(res, 10)
-        page_number = request.GET.get('page', default=1)
-        page = paginator.get_page(page_number)
+    else:
+        paginator = Paginator([], 10)
+
+    page_number = request.GET.get('page', default=1)
+    page = paginator.get_page(page_number)
 
     context = {
         "page": page,

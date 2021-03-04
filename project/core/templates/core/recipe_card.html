@@ -16,14 +16,15 @@
     <div class="col-md-10">
       <div class="card-body">
         <p class="card-text favicon-text text-muted float-right">
-          <img class="mr-1" src="{{ recipe.source_favicon }}" height="16", width="16">
-          {{ recipe.source_name }}
+          <img class="mr-1" src="{{ recipe.source.favicon }}" height="16", width="16">
+          {{ recipe.source.title }}
         </p>
         <h5 class="card-title">{{ recipe.title }}</h5>
         <p class="card-text">
             <ul class="list-inline">
-              {% for ingredient, is_match in recipe.ingredients %}
-                <li class="list-inline-item {% if is_match %} ingr-match {% endif %}">{{ ingredient }}</li>
+            {% comment %} TODO: is_match needs to be added again somehow {% endcomment %}
+              {% for ingredient in recipe.ingredients.all %}
+                <li class="list-inline-item {% if is_match %} ingr-match {% endif %}">{{ ingredient.title }}</li>
               {% endfor %}
             </ul>
             {% if recipe.ratings %}

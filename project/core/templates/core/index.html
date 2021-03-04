@@ -4,50 +4,56 @@
 
 <nav class="navbar navbar-dark bg-dark">
     <!-- Navbar content -->
-    <a class="navbar-brand" href="#">Recipe Search</a>
+    <a class="navbar-brand" href="/">Recipe Search</a>
 </nav>
 <div id="searchBox">
-  {% block search_box %}
+    {% block search_box %}
     {% include 'core/search_box.html' %}
-  {% endblock search_box %}
+    {% endblock search_box %}
 </div>
 <div id="searchResults">
+    {% if time %}
     <div id="resultInfo" class="container pt-4">
-      <h6 class="text-secondary">Found {{ result_count }} recipes in {{ time|floatformat:3 }} seconds</h6>
+        <h5>{{ time }}</h5>
+        <h6 class="text-secondary">Found {{ result_count }} recipes in {{ time|floatformat:3 }} seconds</h6>
     </div>
     {% block filters %}
-      {% include 'core/filters.html' %}
+    {% include 'core/filters.html' %}
     {% endblock filters %}
+    {% endif %}
     <div id="searchResultsContainer" class="container py-4">
-      <div class="card-column">
-        {% for recipe in page %}
-          {% block recipe_card %}
+        <div class="card-column">
+            {% for recipe in page %}
+            {% block recipe_card %}
             {% include 'core/recipe_card.html' %}
-          {% endblock recipe_card %}
-        {% endfor %}
-      </div>
-      <nav>
-        <ul class="pagination justify-content-center">
-          <li class="page-item {% if page.has_previous is not True %} disabled {% endif %}">
-            <a class="page-link" {% if page.has_previous %}href="?{% url_replace page=page.previous_page_number %}"{% endif %} tabindex="-1">
-              <span class="fas fa-chevron-left"></span>
-            </a>
-          </li>
-          {% for pg in page.paginator.page_range %}
-            <li class="page-item {% if pg == page.number %}active{% endif %}">
-              <a class="page-link" href="?{% url_replace page=pg %}">
-                {{ pg }}
-                {% if pg == page.number %}<span class="sr-only">(current)</span>{% endif %}
-              </a>
-            </li>
-          {% endfor %}
-          <li class="page-item {% if page.has_next is not True %} disabled {% endif %}">
-            <a class="page-link" {% if page.has_next %}href="?{% url_replace page=page.next_page_number %}"{% endif %}>
-              <span class="fas fa-chevron-right"></span>
-            </a>
-          </li>
-        </ul>
-      </nav>
+            {% endblock recipe_card %}
+            {% endfor %}
+        </div>
+        <nav>
+            <ul class="pagination justify-content-center">
+                <li class="page-item {% if page.has_previous is not True %} disabled {% endif %}">
+                    <a class="page-link"
+                        {% if page.has_previous %}href="?{% url_replace page=page.previous_page_number %}" {% endif %}
+                        tabindex="-1">
+                        <span class="fas fa-chevron-left"></span>
+                    </a>
+                </li>
+                {% for pg in page.paginator.page_range %}
+                <li class="page-item {% if pg == page.number %}active{% endif %}">
+                    <a class="page-link" href="?{% url_replace page=pg %}">
+                        {{ pg }}
+                        {% if pg == page.number %}<span class="sr-only">(current)</span>{% endif %}
+                    </a>
+                </li>
+                {% endfor %}
+                <li class="page-item {% if page.has_next is not True %} disabled {% endif %}">
+                    <a class="page-link" {% if page.has_next %}href="?{% url_replace page=page.next_page_number %}"
+                        {% endif %}>
+                        <span class="fas fa-chevron-right"></span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
     </div>
 </div>
 
