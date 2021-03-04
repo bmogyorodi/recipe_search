@@ -52,17 +52,13 @@ class Indexer:
         recipe_ingredients = []
         for parsed_ing in parse_ingredients(
                 map(preprocess_ingredient_string, recipe["ingredients"])):
-            name = parsed_ing.get("name")
             # Name must be parsed correctly, otherwise no point
+            name = parsed_ing.get("name")
             if name is None:
                 continue
             ing_obj, _ = Ingredient.objects.get_or_create(title=name)
-            quantity = parse_ingredient_quantity(parsed_ing.get("qty"))
             recipe_ingredients.append(
-                RecipeIngredient(recipe=recipe_obj,
-                                 ingredient=ing_obj,
-                                 quantity=quantity,
-                                 unit=parsed_ing.get("unit") or ""))
+                RecipeIngredient(recipe=recipe_obj, ingredient=ing_obj))
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
         # Create Tags

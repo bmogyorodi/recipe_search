@@ -63,16 +63,9 @@ class Ingredient(CleanableModel):
         return self.title
 
 
-class RecipeIngredient(CleanableModel):
+class RecipeIngredient(models.Model):
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
     ingredient = models.ForeignKey("Ingredient", on_delete=models.CASCADE)
-    quantity = models.FloatField(null=True, blank=True)
-    unit = models.CharField(max_length=64, blank=True)
-
-    def clean(self, *args, **kwargs):
-        self.unit = truncate(self.unit, 64)
-        self.quantity = parse_ingredient_quantity(self.quantity)
-        self.is_cleaned = True
 
 
 class Recipe(CleanableModel):
