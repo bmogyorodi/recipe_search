@@ -93,11 +93,17 @@ def parse_total_time(total_time):
 pattern_nonalphanum = re.compile('[^\w ]')
 pattern_brackets = re.compile('\([^)(]*\)|\{[^}{]*\}|\[[^][]*\]')
 pattern_unicode_fractions = re.compile(
-                            """\u00BC|\u00BD|\u00BE|
-                            \u2150|\u2151|\u2152|\u2153|
-                            \u2154|\u2155|\u2156|\u2157|
-                            \u2158|\u2159|\u215A|\u215B|
-                            \u215C|\u215D|\u215E|\u215F""")
+    "\u00BC|\u00BD|\u00BE|\u2150|\u2151|\u2152|\u2153|\u2154|\u2155|\u2156|"
+    "\u2157|\u2158|\u2159|\u215A|\u215B|\u215C|\u215D|\u215E|\u215F")
+# Mixed fraction, qty range, and alternates handling
+mixed_fraction = r"\d*\s*\d+\/\d+"           # e.g. "5 1/4" OR "51/4"
+unit = r"[a-z]+"                             # simple string unit
+qty = f"({mixed_fraction}|\d+)"              # mixed fraction or just a number
+qty_or_range = f"({qty}\s*-\s*{qty}|{qty})"  # also handle "5 1/4 - 7"
+qty_unit = f"{qty_or_range}\s*{unit}"        # including a string unit
+alternate_or_single_amount = re.compile(     # e.g. "20-50 ml/4-10 1/8 tsp"
+    f"({qty_unit}\s*\/\s*{qty_unit}|{qty_unit})")
+
 
 def preprocess_ingredient_string(ingredient):
     # Case-fold and remove unicode characters
@@ -106,6 +112,8 @@ def preprocess_ingredient_string(ingredient):
     ingredient = ingredient.lower()
     # Remove parentheses with contents, e.g. (8-oz) steak
     ingredient = pattern_brackets.sub('', ingredient)
+    # Essentially remove any possible unit, incl. ranges, mixed fractions, etc.
+    ingredient = alternate_or_single_amount.sub('', ingredient)
     # Remove non-alphanumerical characters, e.g. unclosed parentheses
     ingredient = pattern_nonalphanum.sub('', ingredient)
     # Replace common shorthands with full words
