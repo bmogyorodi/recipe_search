@@ -4,13 +4,14 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
 import unidecode
 from .models import (Token, RecipeToken, Ingredient, RecipeIngredient, Tag)
-from .utils import (parse_ingredients, preprocess_ingredient_string,postprocess_ingredient_string,
+from .utils import (parse_ingredients, preprocess_ingredient_string, postprocess_ingredient_string,
                     preprocess_tags)
 
 
 class Indexer:
     def __init__(self):
         self._token_re = re.compile(r'[a-z\']+')
+        self._andor_re = re.compile(r' and | or ')
         # Download "stopwords" if not available
         try:
             stopwords.words('english')
@@ -56,10 +57,12 @@ class Indexer:
             name = parsed_ing.get("name")
             if name is None:
                 continue
-            name = postprocess_ingredient_string(name)
-            ing_obj, _ = Ingredient.objects.get_or_create(title=name)
-            recipe_ingredients.append(
-                RecipeIngredient(recipe=recipe_obj, ingredient=ing_obj))
+            # Try splitting on " and "/" or " for ingredient alternatives
+            for name in self._andor_re.split(name):
+                name = postprocess_ingredient_string(name)
+                ing_obj, _ = Ingredient.objects.get_or_create(title=name)
+                recipe_ingredients.append(
+                    RecipeIngredient(recipe=recipe_obj, ingredient=ing_obj))
         RecipeIngredient.objects.bulk_create(recipe_ingredients)
 
         # Create Tags

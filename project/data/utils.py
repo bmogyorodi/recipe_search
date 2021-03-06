@@ -104,6 +104,7 @@ qty_unit = f"{qty_or_range}\s*{unit}"        # including a string unit
 alternate_or_single_amount = re.compile(     # e.g. "20-50 ml/4-10 1/8 tsp"
     f"({qty_unit}\s*\/\s*{qty_unit}|{qty_unit})")
 
+
 def preprocess_ingredient_string(ingredient):
     # Case-fold and remove unicode characters
     ingredient = pattern_unicode_fractions.sub('', ingredient)
@@ -123,24 +124,32 @@ def preprocess_ingredient_string(ingredient):
     # Unnecessary whitespace is dealt with in parse_ingredients
     return ingredient
 
-pattern_ml = re.compile('^((\d)+ ?)?ml') # e.g. "140 ml" OR "140ml" or "ml"
-pattern_cups = re.compile('^(\d+)? ?cup(s)?') # e.g. 34cups OR 34 cups OR 1 cup 
+
+pattern_ml = re.compile('^((\d)+ ?)?ml')  # e.g. "140 ml" OR "140ml" or "ml"
+# e.g. 34cups OR 34 cups OR 1 cup
+pattern_cups = re.compile('^(\d+)? ?cup(s)?')
 pattern_numqty = re.compile('^\d+( )?')  # numbers at start of string
 
+
 def postprocess_ingredient_string(ingredient):
+    # Since string beginning is important, strip before doing anything else
+    ingredient = ingredient.strip()
     if 'ounces' in ingredient:
-        ingredient = ingredient.split('ounces')[1] # e.g. "100 milliliters10fl ounces double cream"
+        # e.g. "100 milliliters10fl ounces double cream"
+        ingredient = ingredient.split('ounces')[1]
     if 'lb' in ingredient:
-        ingredient = ingredient.split('lb')[1] # e.g. "450 grams1lb caster sugar"
+        # e.g. "450 grams1lb caster sugar"
+        ingredient = ingredient.split('lb')[1]
     if ingredient[:2] == 'g ':
-        ingredient = ingredient[2:] # e.g. "g caster sugar"
+        ingredient = ingredient[2:]  # e.g. "g caster sugar"
     if ingredient[:2] == 'x ':
-        ingredient = ingredient[2:] # e.g. "x tomatoes"
-    ingredient = pattern_ml.sub('',ingredient) # e.g. 140ml milk
-    ingredient = pattern_cups.sub('',ingredient) # e.g. 34 cups flour
-    ingredient = pattern_numqty.sub('',ingredient) # e.g. 30 carrots
+        ingredient = ingredient[2:]  # e.g. "x tomatoes"
+    ingredient = pattern_ml.sub('', ingredient)  # e.g. 140ml milk
+    ingredient = pattern_cups.sub('', ingredient)  # e.g. 34 cups flour
+    ingredient = pattern_numqty.sub('', ingredient)  # e.g. 30 carrots
     ingredient = ingredient.strip()
     return ingredient
+
 
 tag_separator = re.compile(r",|\/")
 tag_remove = re.compile(r"inspired|styled?|n\/a|https?[^\s]+")
