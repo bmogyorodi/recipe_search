@@ -10,7 +10,7 @@ from .utils import (parse_ingredients, preprocess_ingredient_string, postprocess
 
 class Indexer:
     def __init__(self):
-        self._token_re = re.compile(r'[a-z\']+')
+        self._token_re = re.compile(r'[a-z\']+(?<!\'s)')
         self._andor_re = re.compile(r' and | or ')
         # Download "stopwords" if not available
         try:
