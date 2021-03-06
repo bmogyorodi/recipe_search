@@ -123,6 +123,24 @@ def preprocess_ingredient_string(ingredient):
     # Unnecessary whitespace is dealt with in parse_ingredients
     return ingredient
 
+pattern_ml = re.compile('^((\d)+ ?)?ml') # e.g. "140 ml" OR "140ml" or "ml"
+pattern_cups = re.compile('^(\d+)? ?cup(s)?') # e.g. 34cups OR 34 cups OR 1 cup 
+pattern_numqty = re.compile('^\d+( )?')  # numbers at start of string
+
+def postprocess_ingredient_string(ingredient):
+    if 'ounces' in ingredient:
+        ingredient = ingredient.split('ounces')[1] # e.g. "100 milliliters10fl ounces double cream"
+    if 'lb' in ingredient:
+        ingredient = ingredient.split('lb')[1] # e.g. "450 grams1lb caster sugar"
+    if ingredient[:2] == 'g ':
+        ingredient = ingredient[2:] # e.g. "g caster sugar"
+    if ingredient[:2] == 'x ':
+        ingredient = ingredient[2:] # e.g. "x tomatoes"
+    ingredient = pattern_ml.sub('',ingredient) # e.g. 140ml milk
+    ingredient = pattern_cups.sub('',ingredient) # e.g. 34 cups flour
+    ingredient = pattern_numqty.sub('',ingredient) # e.g. 30 carrots
+    ingredient = ingredient.strip()
+    return ingredient
 
 tag_separator = re.compile(r",|\/")
 tag_remove = re.compile(r"inspired|styled?|n\/a|https?[^\s]+")

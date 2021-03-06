@@ -4,7 +4,7 @@ from nltk.stem.wordnet import WordNetLemmatizer
 from nltk.corpus import stopwords
 import unidecode
 from .models import (Token, RecipeToken, Ingredient, RecipeIngredient, Tag)
-from .utils import (parse_ingredients, preprocess_ingredient_string,
+from .utils import (parse_ingredients, preprocess_ingredient_string,postprocess_ingredient_string,
                     preprocess_tags)
 
 
@@ -56,6 +56,7 @@ class Indexer:
             name = parsed_ing.get("name")
             if name is None:
                 continue
+            name = postprocess_ingredient_string(name)
             ing_obj, _ = Ingredient.objects.get_or_create(title=name)
             recipe_ingredients.append(
                 RecipeIngredient(recipe=recipe_obj, ingredient=ing_obj))
