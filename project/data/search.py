@@ -1,7 +1,6 @@
 from .indexer import Indexer
 from .spelling import SpellChecker
 from .models import RecipeToken, Recipe
-from django.db.models import Count
 from collections import defaultdict, Counter
 from math import log10
 import numpy as np
@@ -37,15 +36,14 @@ class RankedSearch:
             df = RecipeToken.objects.filter(token__title=token).count()
 
             # Calculate the term frequency (tf) for each document
-            tfs = (RecipeToken.objects.filter(token__title=token)
-                                      .values("recipe")
-                                      .annotate(tf=Count("token"))
-                                      .values_list("recipe", "tf"))
+            tfs = Counter(RecipeToken.objects.filter(token__title=token)
+                                             .values_list("recipe__id", flat=True))
 
             # Update query tfidf vector
             query_tfidf_vector[i] = tfidf_weight(query_tf, df, self.doc_count)
 
-            for recipe_id, tf in tfs:
+            # Update recipe tfidf vectors
+            for recipe_id, tf in tfs.items():
                 tfidf_vectors[recipe_id][i] = tfidf_weight(tf, df, self.doc_count)
 
         for recipe_id, tfidf_vector in tfidf_vectors.items():
