@@ -71,6 +71,7 @@ class Indexer:
 
         # Create RecipeTokens
         recipe_token = []
+        recipe_length = 0
         for text_part, text in recipe_text.items():
             tokens = self._preprocess_text(text)
             token_type = self.text_part_to_int[text_part]
@@ -82,4 +83,7 @@ class Indexer:
                                 recipe=recipe_obj,
                                 position=pos,
                                 token_type=token_type))
+            recipe_length += len(tokens)
         RecipeToken.objects.bulk_create(recipe_token)
+        recipe_obj.length = recipe_length
+        recipe_obj.save()

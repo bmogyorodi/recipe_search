@@ -112,6 +112,9 @@ class Recipe(CleanableModel):
         related_name="recipes",
         related_query_name="recipe")
 
+    # Document length
+    length = models.PositiveIntegerField(null=True)
+
     # Nutrients kept in original camel-case name format
     # 'value' is not used very often and doesn't contain anything useful
     servingSize = models.CharField(max_length=64, blank=True)
