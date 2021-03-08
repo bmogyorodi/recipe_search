@@ -1,4 +1,5 @@
 from recipe_scrapers import scrape_me, NoSchemaFoundInWildMode
+from requests.exceptions import TooManyRedirects
 from pathlib import Path
 from datetime import timedelta
 import logging
@@ -152,7 +153,7 @@ class Scraper():
 
                 try:
                     recipe = self._scrape_recipe(id=id)
-                except NoSchemaFoundInWildMode:
+                except (NoSchemaFoundInWildMode, TooManyRedirects):
                     recipe = None
                 recipes_requests += 1
                 # No recipe returned -> doesn't exist
