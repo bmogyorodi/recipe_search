@@ -64,7 +64,14 @@ sample_tags = ["Spanish", "Greek", "Italian",
 
 
 def home(request):
-    return render(request, 'core/home.html')
+    # Retrieve 3 recipes at random to display as suggestions
+    recipes = Recipe.objects.all().order_by("?")[:3]
+
+    context = {
+        "recipes": recipes
+    }
+
+    return render(request, 'core/home.html', context=context)
 
 
 def search(request):
