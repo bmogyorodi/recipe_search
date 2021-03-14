@@ -1,0 +1,15 @@
+{% extends "core/base.html"%}
+{% load paginator %}
+{% block content %}
+
+<nav class="navbar navbar-dark bg-dark">
+    <!-- Navbar content -->
+    <a class="navbar-brand" href="/">Recipe Search</a>
+</nav>
+<div id="searchBox">
+    {% block search_box %}
+    {% include 'core/search_box.html' %}
+    {% endblock search_box %}
+</div>
+
+{% endblock content %}

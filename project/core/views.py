@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.db.models import When, Case, DecimalField
 
-from data.models import Recipe, Source
+from data.models import Recipe
 from data.search import RankedSearch
 
 from time import time
@@ -64,6 +64,10 @@ sample_tags = ["Spanish", "Greek", "Italian",
 
 
 def home(request):
+    return render(request, 'core/home.html')
+
+
+def search(request):
     search_exp = request.GET.get("q", default="").replace("+", " ")
     use_fake_data = request.GET.get("fake_data", default="False")
 
@@ -119,4 +123,4 @@ def home(request):
         "result_count": len(res)
     }
 
-    return render(request, 'core/index.html', context)
+    return render(request, 'core/search.html', context)
