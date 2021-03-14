@@ -23,7 +23,7 @@
       <div class="card card-body card-block">
         <div class="row">
           <div class="col-md-4">
-            <label for="IngrIncludeInput"><h6 style="color: #32ab30; font-weight: 600;">Ingredients to include</h5></label>
+            <label for="IngrIncludeInput"><h5 class="text-success">Ingredients to include</h5></label>
             <div class="input-group">
               <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrIncludeInput" placeholder="Enter ingredient">
               <div class="input-group-append">
@@ -34,9 +34,11 @@
             </div>
           </div>
           <div class="col-md-8">
-            <ul id="IncludedIngrList" class="list-inline">
+            <ul id="IncludedIngrList" class="list-inline float-bottom">
               {% for ingr in search_params.included_ingr %}
-                <li class="list-inline-item">{{ ingr }}</li>
+                <li class="list-inline-item">
+                  <button data-ingredient="{{ ingr }}" class="btn btn-outline-secondary rounded-pill"><i class="fas fa-times"></i> {{ ingr }}</button>
+                </li>
               {% endfor %}
             </ul>
           </div>
@@ -44,7 +46,7 @@
         <hr/>
         <div class="row">
           <div class="col-md-4">
-            <label for="IngrExcludeInput"><h6 style="color: #eb4034; font-weight: 600;">Ingredients to exclude</h5></label>
+            <label for="IngrExcludeInput"><h5 class="text-danger">Ingredients to exclude</h5></label>
             <div class="input-group">
               <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrExcludeInput" placeholder="Enter ingredient">
               <div class="input-group-append">
