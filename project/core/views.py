@@ -28,36 +28,46 @@ def home(request):
 
 def search(request):
     search_exp = request.GET.get("q", default="").replace("+", " ")
+    page_number = request.GET.get('page', default=1)
 
     included_ingr_str = request.GET.get("include", default="")
     included_ingr = [] if included_ingr_str == "" else included_ingr_str.split(
         ",")
-
     excluded_ingr_str = request.GET.get("exclude", default="")
     excluded_ingr = [] if excluded_ingr_str == "" else excluded_ingr_str.split(
         ",")
-
     must_have_ingr_str = request.GET.get("must_have", default="")
     must_have = [] if must_have_ingr_str == "" else must_have_ingr_str.split(
         ",")
 
-    total_time = None
-
     t_start = time()
-    res = recipe_search(query=search_exp,
-                        include=included_ingr,
-                        must_have=must_have,
-                        exclude=excluded_ingr,
-                        count=100)
-    t_retrieval = time()
+    # If search is identical to the last (e.g. new page), use session instead
+    if (
+        len(request.session.get("recipe_pks", [])) > 0 and
+        search_exp == request.session.get("search_exp") and
+        included_ingr == request.session.get("included_ingr") and
+        excluded_ingr == request.session.get("excluded_ingr") and
+        must_have == request.session.get("must_have")
+    ):
+        res = [Recipe.objects.get(pk=pk)
+               for pk in request.session["recipe_pks"]]
+    else:
+        res = recipe_search(query=search_exp,
+                            include=included_ingr,
+                            must_have=must_have,
+                            exclude=excluded_ingr,
+                            count=100)
+        # Save found recipe PKs for quick loading next pages
+        request.session["recipe_pks"] = [r.pk for r in res]
+        # Save search parameters to determine a new search or not on next run
+        request.session["search_exp"] = search_exp
+        request.session["included_ingr"] = included_ingr
+        request.session["excluded_ingr"] = excluded_ingr
+        request.session["must_have"] = must_have
 
-    t_data = time()
-    total_time = (f"Retrieval: {t_retrieval - t_start:.4f}, "
-                  f"Processing: {t_data -t_retrieval:.4f}, "
-                  f"Total: {time() - t_start:.4f}")
+    total_time = f"Total time: {time() - t_start:.3f} seconds"
     paginator = Paginator(res, 10)
 
-    page_number = request.GET.get('page', default=1)
     page = paginator.get_page(page_number)
 
     context = {
