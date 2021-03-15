@@ -37,7 +37,7 @@ def search(request):
     excluded_ingr_str = request.GET.get("exclude", default="")
     excluded_ingr = [] if excluded_ingr_str == "" else excluded_ingr_str.split(
         ",")
-    must_have_ingr_str = request.GET.get("must_have", default="")
+    must_have_ingr_str = request.GET.get("musthave", default="")
     must_have = [] if must_have_ingr_str == "" else must_have_ingr_str.split(
         ",")
 
