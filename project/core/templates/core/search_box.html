@@ -82,7 +82,7 @@
           </div>
           <div class="col-md-8">
             <ul id="MustHaveIngrList" class="list-inline float-bottom">
-              {% for ingr in search_params.musthave_ingr %}
+              {% for ingr in search_params.must_have %}
                 <li class="list-inline-item">
                   <button data-ingredient="{{ ingr }}" data-list-id="MustHaveIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
                 </li>
@@ -108,7 +108,7 @@
 
 {{ search_params.included_ingr|json_script:"IncludedIngrData" }}
 {{ search_params.excluded_ingr|json_script:"ExcludedIngrData" }}
-{{ search_params.musthave_ingr|json_script:"MustHaveIngrData" }}
+{{ search_params.must_have|json_script:"MustHaveIngrData" }}
 {{ ingredients|json_script:"AllIngrData" }}
 
 {% endblock search_box %}
