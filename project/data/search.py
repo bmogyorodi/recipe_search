@@ -20,9 +20,13 @@ def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
         res = list(recipe_ids)
         random.shuffle(res)
     else:
-        res = RankedSearch().search(query, recipe_ids)
+        res = RankedSearch().search(query)
 
-    return [Recipe.objects.get(id=recipe_id) for recipe_id in res[:count]]
+    if recipe_ids is not None:
+        res = [recipe_id for recipe_id in res if recipe_id in recipe_ids]
+
+    return [Recipe.objects.get(id=recipe_id) for recipe_id in res[:count]
+            if recipe_id in recipe_ids]
 
 
 class BooleanIngredientSearch:
@@ -40,7 +44,7 @@ class BooleanIngredientSearch:
 
         first_include = True
 
-        for ingredient in include:
+        for ingredient in include + must_have:
             recipes_with_ingr = self._get_recipes_with_ingr(ingredient.lower())
             if ingredient in must_have:
                 if first_include:
@@ -64,7 +68,7 @@ class RankedSearch:
         self.doc_count = Recipe.objects.count()
         self.spell_checker = SpellChecker()
 
-    def search(self, query, recipe_ids=None):
+    def search(self, query):
         def tfidf_weight(tf, df, N):
             return (1 + log10(tf)) * log10(N / df)
 
@@ -79,15 +83,8 @@ class RankedSearch:
 
         scores = defaultdict(float)
 
-        # Get all RecipeTokens for the given recipe ids. If no recipe ids are given get all of them
-        if recipe_ids is None:
-            all_recipetokens = RecipeToken.objects.all()
-        else:
-            all_recipetokens = RecipeToken.objects.filter(
-                recipe__in=recipe_ids)
-
         for token in tokens:
-            recipetoken_objs = all_recipetokens.filter(token__title=token)
+            recipetoken_objs = RecipeToken.objects.filter(token__title=token)
 
             # Find the document frequency (df) from the inverted index
             df = recipetoken_objs.count()
