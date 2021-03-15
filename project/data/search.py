@@ -25,8 +25,7 @@ def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
     if recipe_ids is not None:
         res = [recipe_id for recipe_id in res if recipe_id in recipe_ids]
 
-    return [Recipe.objects.get(id=recipe_id) for recipe_id in res[:count]
-            if recipe_id in recipe_ids]
+    return [Recipe.objects.get(id=recipe_id) for recipe_id in res[:count]]
 
 
 class BooleanIngredientSearch:
