@@ -30,14 +30,13 @@ class BooleanIngredientSearch:
         """
         Finds all recipes with an ingredient which has the given ingredient as substring
         """
-        return set(RecipeIngredient.objects.filter(ingredient__title__contains=ingr)
-                                           .values_list("recipe", flat=True))
+        return set(RecipeIngredient.objects.filter(
+            ingredient__title__contains=ingr).values_list("recipe", flat=True))
 
     def search(self, include=[], must_have=[], exclude=[]):
+        res = set()
         if len(include) == 0:
-            res = set(Recipe.objects.all().values("id", flat=True))
-        else:
-            res = set()
+            res = set(Recipe.objects.all().values_list("id", flat=True))
 
         first_include = True
 
@@ -84,7 +83,8 @@ class RankedSearch:
         if recipe_ids is None:
             all_recipetokens = RecipeToken.objects.all()
         else:
-            all_recipetokens = RecipeToken.objects.filter(recipe__in=recipe_ids)
+            all_recipetokens = RecipeToken.objects.filter(
+                recipe__in=recipe_ids)
 
         for token in tokens:
             recipetoken_objs = all_recipetokens.filter(token__title=token)

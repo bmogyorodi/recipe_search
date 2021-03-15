@@ -8,10 +8,10 @@ from data.search import recipe_search
 from time import time
 
 
-sample_ingredients = ["Chicken", "Tomato", "Garlic",
+# TODO: change to actual ingredients and tags
+search_ingredients = ["Chicken", "Tomato", "Garlic",
                       "Cheddar", "Salt", "Pepper", "Plain Flour"]
-
-sample_tags = ["Spanish", "Greek", "Italian",
+search_tags = ["Spanish", "Greek", "Italian",
                "Mexican", "British", "Polish", "German"]
 
 
@@ -20,7 +20,8 @@ def home(request):
     recipes = Recipe.objects.all().order_by("?")[:3]
 
     context = {
-        "recipes": recipes
+        "recipes": recipes,
+        "ingredients": search_ingredients,
     }
 
     return render(request, 'core/home.html', context=context)
@@ -72,8 +73,8 @@ def search(request):
 
     context = {
         "page": page,
-        "ingredients": sample_ingredients,
-        "tags": sample_tags,
+        "ingredients": search_ingredients,
+        "tags": search_tags,
         "search_params": {
             "search_exp": search_exp,
             "included_ingr": included_ingr,
