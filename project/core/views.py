@@ -78,7 +78,8 @@ def search(request):
         "search_params": {
             "search_exp": search_exp,
             "included_ingr": included_ingr,
-            "excluded_ingr": excluded_ingr
+            "excluded_ingr": excluded_ingr,
+            "musthave_ingr": musthave_ingr
         },
         "time": total_time,
         "result_count": len(res)
