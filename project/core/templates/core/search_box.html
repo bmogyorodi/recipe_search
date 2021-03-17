@@ -3,10 +3,11 @@
 <div class="container p-4">
   <div class="row">
     <div class="col-md-11 p-1">
-      <form id="searchForm" action="/" method="get" class="input-group input-group-lg">
+      <form id="searchForm" action="/search" method="get" class="input-group input-group-lg">
           <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe" value="{{ search_params.search_exp }}">
           <input type="hidden" id="IncludeListInput" name="include" value="">
           <input type="hidden" id="ExcludeListInput" name="exclude" value="">
+          <input type="hidden" id="MustHaveListInput" name="musthave" value="">
           <div class="input-group-append">
             <button class="btn btn-dark" type="submit">
               <span class="fas fa-search"></span>
@@ -21,9 +22,34 @@
     </div>
     <div class="collapse container px-0 pt-2" id="advancedSearchBox">
       <div class="card card-body card-block">
+        <!--Must-have Ingredients-->
         <div class="row">
           <div class="col-md-4">
-            <label for="IngrIncludeInput"><h6 style="color: #32ab30; font-weight: 600;">Ingredients to include</h5></label>
+            <label for="IngrMustHaveInput"><h5 class="text-info">Must-have ingredients</h5></label>
+            <div class="input-group">
+              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrMustHaveInput" placeholder="Enter ingredient">
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit" id="IngrMustHaveButton">
+                  <span class="fas fa-arrow-right">
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <ul id="MustHaveIngrList" class="list-inline float-bottom">
+              {% for ingr in search_params.must_have %}
+                <li class="list-inline-item">
+                  <button data-ingredient="{{ ingr }}" data-list-id="MustHaveIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <hr/>
+        <!--Included Ingredients-->
+        <div class="row">
+          <div class="col-md-4">
+            <label for="IngrIncludeInput"><h5 class="text-success">Ingredients to include</h5></label>
             <div class="input-group">
               <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrIncludeInput" placeholder="Enter ingredient">
               <div class="input-group-append">
@@ -34,17 +60,20 @@
             </div>
           </div>
           <div class="col-md-8">
-            <ul id="IncludedIngrList" class="list-inline">
+            <ul id="IncludedIngrList" class="list-inline float-bottom">
               {% for ingr in search_params.included_ingr %}
-                <li class="list-inline-item">{{ ingr }}</li>
+                <li class="list-inline-item">
+                  <button data-ingredient="{{ ingr }}" data-list-id="IncludedIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
+                </li>
               {% endfor %}
             </ul>
           </div>
         </div>
         <hr/>
+        <!--Excluded Ingredients-->
         <div class="row">
           <div class="col-md-4">
-            <label for="IngrExcludeInput"><h6 style="color: #eb4034; font-weight: 600;">Ingredients to exclude</h5></label>
+            <label for="IngrExcludeInput"><h5 class="text-danger">Ingredients to exclude</h5></label>
             <div class="input-group">
               <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrExcludeInput" placeholder="Enter ingredient">
               <div class="input-group-append">
@@ -57,12 +86,15 @@
           <div class="col-md-8">
             <ul id="ExcludedIngrList" class="list-inline">
               {% for ingr in search_params.excluded_ingr %}
-                <li class="list-inline-item">{{ ingr }}</li>
+                <li class="list-inline-item">
+                  <button data-ingredient="{{ ingr }}" data-list-id="ExcludedIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
+                </li>
               {% endfor %}
             </ul>
           </div>
         </div>
         <hr/>
+        <!--Clear Button-->
         <div class="container">
           <button id="ClearIngrButton" class="btn btn-danger float-right">Clear</button>
         </div>
@@ -80,6 +112,7 @@
 
 {{ search_params.included_ingr|json_script:"IncludedIngrData" }}
 {{ search_params.excluded_ingr|json_script:"ExcludedIngrData" }}
+{{ search_params.must_have|json_script:"MustHaveIngrData" }}
 {{ ingredients|json_script:"AllIngrData" }}
 
 {% endblock search_box %}

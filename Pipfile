@@ -19,6 +19,7 @@ ingredient-phrase-tagger = {git = "https://github.com/mtlynch/ingredient-phrase-
 numpy = "*"
 scikit-learn = "*"
 pandas="*"
+gevent = "*"
 
 [requires]
 python_version = "3.8"

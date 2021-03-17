@@ -1,10 +1,64 @@
 from .indexer import Indexer
 from .spelling import SpellChecker
-from .models import RecipeToken, Recipe
-from collections import defaultdict, Counter
+from .models import RecipeToken, Recipe, RecipeIngredient
+from collections import defaultdict
+import random
 from django.db.models import Count, Min
 from math import log10
-import numpy as np
+
+
+def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
+    if len(include) == 0 and len(must_have) == 0 and len(exclude) == 0:
+        recipe_ids = None
+    else:
+        recipe_ids = BooleanIngredientSearch().search(include=include,
+                                                      must_have=must_have,
+                                                      exclude=exclude)
+
+    if len(query) == 0:
+        random.seed(10)
+        res = list(recipe_ids)
+        random.shuffle(res)
+    else:
+        res = RankedSearch().search(query)
+
+    if recipe_ids is not None:
+        res = [recipe_id for recipe_id in res if recipe_id in recipe_ids]
+
+    return [Recipe.objects.get(id=recipe_id) for recipe_id in res[:count]]
+
+
+class BooleanIngredientSearch:
+    def _get_recipes_with_ingr(self, ingr):
+        """
+        Finds all recipes with an ingredient which has the given ingredient as substring
+        """
+        return set(RecipeIngredient.objects.filter(
+            ingredient__title__contains=ingr).values_list("recipe", flat=True))
+
+    def search(self, include=[], must_have=[], exclude=[]):
+        res = set()
+        if len(include) == 0:
+            res = set(Recipe.objects.all().values_list("id", flat=True))
+
+        first_include = True
+
+        for ingredient in include + must_have:
+            recipes_with_ingr = self._get_recipes_with_ingr(ingredient.lower())
+            if ingredient in must_have:
+                if first_include:
+                    first_include = False
+                    res = recipes_with_ingr
+                else:
+                    res &= recipes_with_ingr
+            else:
+                res |= recipes_with_ingr
+
+        for ingredient in exclude:
+            recipes_with_ingr = self._get_recipes_with_ingr(ingredient.lower())
+            res -= recipes_with_ingr
+
+        return res
 
 
 class RankedSearch:
@@ -44,7 +98,7 @@ class RankedSearch:
                 scores[recipe_id] += tfidf_weight(tf, df, self.doc_count) * \
                     (2 if min_token_type == 1 else 1)
 
-        return sorted(scores.items(), key=lambda item: item[1], reverse=True)
+        return [x[0] for x in sorted(scores.items(), key=lambda item: item[1], reverse=True)]
 
     """
     def search(self, query):
