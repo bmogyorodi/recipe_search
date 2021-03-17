@@ -24,3 +24,9 @@ def version():
 def commit_id():
     from django.conf import settings
     return settings.COMMIT_ID
+
+
+@register.filter
+def setify(obj):
+    print(obj)
+    return set(obj)
