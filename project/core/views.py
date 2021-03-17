@@ -2,15 +2,15 @@ from django.shortcuts import render
 from django.core.paginator import Paginator
 from django.db.models import When, Case, DecimalField
 
-from data.models import Recipe
+from data.models import Recipe, Ingredient
 from data.search import recipe_search
 
 from time import time
 
 
 # TODO: change to actual ingredients and tags
-search_ingredients = ["Chicken", "Tomato", "Garlic",
-                      "Cheddar", "Salt", "Pepper", "Plain Flour"]
+search_ingredients = ["Onion", "Parmesan", "Chicken", "Tomato",
+                      "Garlic", "Cheddar", "Salt", "Pepper", "Plain Flour"]
 search_tags = ["Spanish", "Greek", "Italian",
                "Mexican", "British", "Polish", "German"]
 
@@ -22,6 +22,9 @@ def home(request):
     context = {
         "recipes": recipes,
         "ingredients": search_ingredients,
+        "search_params": {"included_ingr": [],
+                          "excluded_ingr": [],
+                          "must_have": []}
     }
 
     return render(request, 'core/home.html', context=context)
