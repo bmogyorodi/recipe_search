@@ -22,6 +22,31 @@
     </div>
     <div class="collapse container px-0 pt-2" id="advancedSearchBox">
       <div class="card card-body card-block">
+        <!--Must-have Ingredients-->
+        <div class="row">
+          <div class="col-md-4">
+            <label for="IngrMustHaveInput"><h5 class="text-info">Must-have ingredients</h5></label>
+            <div class="input-group">
+              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrMustHaveInput" placeholder="Enter ingredient">
+              <div class="input-group-append">
+                <button class="btn btn-secondary" type="submit" id="IngrMustHaveButton">
+                  <span class="fas fa-arrow-right">
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-8">
+            <ul id="MustHaveIngrList" class="list-inline float-bottom">
+              {% for ingr in search_params.must_have %}
+                <li class="list-inline-item">
+                  <button data-ingredient="{{ ingr }}" data-list-id="MustHaveIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
+                </li>
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+        <hr/>
+        <!--Included Ingredients-->
         <div class="row">
           <div class="col-md-4">
             <label for="IngrIncludeInput"><h5 class="text-success">Ingredients to include</h5></label>
@@ -45,6 +70,7 @@
           </div>
         </div>
         <hr/>
+        <!--Excluded Ingredients-->
         <div class="row">
           <div class="col-md-4">
             <label for="IngrExcludeInput"><h5 class="text-danger">Ingredients to exclude</h5></label>
@@ -68,29 +94,7 @@
           </div>
         </div>
         <hr/>
-        <div class="row">
-          <div class="col-md-4">
-            <label for="IngrMustHaveInput"><h5 class="text-info">Must-have ingredients</h5></label>
-            <div class="input-group">
-              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrMustHaveInput" placeholder="Enter ingredient">
-              <div class="input-group-append">
-                <button class="btn btn-secondary" type="submit" id="IngrMustHaveButton">
-                  <span class="fas fa-arrow-right">
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-8">
-            <ul id="MustHaveIngrList" class="list-inline float-bottom">
-              {% for ingr in search_params.must_have %}
-                <li class="list-inline-item">
-                  <button data-ingredient="{{ ingr }}" data-list-id="MustHaveIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-      </hr>
+        <!--Clear Button-->
         <div class="container">
           <button id="ClearIngrButton" class="btn btn-danger float-right">Clear</button>
         </div>
