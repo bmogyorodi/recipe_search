@@ -17,6 +17,8 @@ django-autocomplete-light = "*"
 unidecode = "*"
 ingredient-phrase-tagger = {git = "https://github.com/mtlynch/ingredient-phrase-tagger"}
 numpy = "*"
+scikit-learn = "*"
+pandas="*"
 
 [requires]
 python_version = "3.8"
