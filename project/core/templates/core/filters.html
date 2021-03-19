@@ -4,11 +4,11 @@
 {% load static %}
 
 <div id="filters" class="container pt-2">
-    <a id="deleteFilter" class="btn btn-outline-primary rounded-pill mr-1 mb-1" href="?{% url_replace tag='' %}">
+    <a id="deleteFilter" class="btn btn-outline-primary rounded-pill mr-1 mb-1" href="?{% url_replace tag='' page=1 %}">
         All
     </a>
     {% for tag, count in tags %}
-    <a id="{{ tag }}Filter" class="btn btn-outline-secondary rounded-pill mr-1 mb-1" href="?{% url_replace tag=tag %}">
+    <a id="{{ tag }}Filter" class="btn btn-outline-secondary rounded-pill mr-1 mb-1" href="?{% url_replace tag=tag page=1 %}">
         {{ tag|capfirst }} ({{ count }})
     </a>
     {% endfor %}
