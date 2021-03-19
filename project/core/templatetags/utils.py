@@ -28,5 +28,4 @@ def commit_id():
 
 @register.filter
 def setify(obj):
-    print(obj)
     return set(obj)

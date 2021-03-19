@@ -1,8 +1,8 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from django.db.models import When, Case, DecimalField
+from django.db.models import Count
 
-from data.models import Recipe, Ingredient
+from data.models import Recipe, Ingredient, Tag
 from data.search import recipe_search
 
 from time import time
@@ -34,6 +34,7 @@ def search(request):
     search_exp = request.GET.get("q", default="").replace("+", " ")
     page_number = request.GET.get('page', default=1)
 
+    tag_filter = request.GET.get("tag", default="")
     included_ingr_str = request.GET.get("include", default="")
     included_ingr = [] if included_ingr_str == "" else included_ingr_str.split(
         ",")
@@ -43,8 +44,6 @@ def search(request):
     must_have_ingr_str = request.GET.get("musthave", default="")
     must_have = [] if must_have_ingr_str == "" else must_have_ingr_str.split(
         ",")
-
-    # TODO: add filtering for cuisines, if only cuisine changes don't re-search, just filter the retrieved results
 
     t_start = time()
     # If search is identical to the last (e.g. new page), use session instead
@@ -70,11 +69,19 @@ def search(request):
         request.session["included_ingr"] = included_ingr
         request.session["excluded_ingr"] = excluded_ingr
         request.session["must_have"] = must_have
-
+    # Filter by tag if any selected
+    if tag_filter != "":
+        res = [r for r in res
+               if tag_filter in r.tags.values_list("title", flat=True)]
     total_time = time() - t_start
+    # Get paginator and current page
     paginator = Paginator(res, 10)
-
     page = paginator.get_page(page_number)
+    # Compile available search tags for retrieved recipes
+    search_tags = Tag.objects.filter(
+        recipe__pk__in=request.session["recipe_pks"]).annotate(
+            count=Count("recipe")
+    ).values_list("title", "count").distinct().order_by("-count")
 
     context = {
         "page": page,
