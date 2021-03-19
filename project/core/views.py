@@ -44,6 +44,8 @@ def search(request):
     must_have = [] if must_have_ingr_str == "" else must_have_ingr_str.split(
         ",")
 
+    # TODO: add filtering for cuisines, if only cuisine changes don't re-search, just filter the retrieved results
+
     t_start = time()
     # If search is identical to the last (e.g. new page), use session instead
     if (
@@ -69,7 +71,7 @@ def search(request):
         request.session["excluded_ingr"] = excluded_ingr
         request.session["must_have"] = must_have
 
-    total_time = f"Total time: {time() - t_start:.3f} seconds"
+    total_time = time() - t_start
     paginator = Paginator(res, 10)
 
     page = paginator.get_page(page_number)
