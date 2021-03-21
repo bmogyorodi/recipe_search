@@ -100,3 +100,24 @@ var ingr_buttons = document.getElementsByClassName("ingr-button");
 for (var i = 0; i < ingr_buttons.length; i++) {
     ingr_buttons[i].onclick = ingredientButtonClick;
 }
+
+document.getElementById("IngrMustHaveInput").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("IngrMustHaveButton").click();
+    }
+});
+
+document.getElementById("IngrIncludeInput").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("IngrIncludeButton").click();
+    }
+});
+
+document.getElementById("IngrExcludeInput").addEventListener("keyup", function(event) {
+    if (event.key === "Enter") {
+        event.preventDefault();
+        document.getElementById("IngrExcludeButton").click();
+    }
+});
