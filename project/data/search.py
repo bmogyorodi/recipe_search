@@ -17,7 +17,7 @@ def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
 
     if len(query) == 0:
         random.seed(10)
-        res = list(recipe_ids)
+        res = list(recipe_ids) if recipe_ids is not None else []
         random.shuffle(res)
     else:
         res = RankedSearch().search(query)

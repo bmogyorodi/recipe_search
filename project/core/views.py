@@ -8,16 +8,13 @@ from data.search import recipe_search
 from time import time
 
 
-# TODO: change to actual ingredients and tags
-search_ingredients = ["Onion", "Parmesan", "Chicken", "Tomato",
-                      "Garlic", "Cheddar", "Salt", "Pepper", "Plain Flour"]
-search_tags = ["Spanish", "Greek", "Italian",
-               "Mexican", "British", "Polish", "German"]
+search_ingredients = list(Ingredient.objects.values_list("title", flat=True))
+search_ingredients.remove("")
 
 
 def home(request):
     # Retrieve 3 recipes at random to display as suggestions
-    recipes = Recipe.objects.all().order_by("?")[:3]
+    recipes = Recipe.objects.filter(ratings__gte=3.5).order_by("?")[:3]
 
     context = {
         "recipes": recipes,
