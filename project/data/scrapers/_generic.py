@@ -153,7 +153,7 @@ class Scraper():
 
                 try:
                     recipe = self._scrape_recipe(id=id)
-                except (NoSchemaFoundInWildMode, TooManyRedirects):
+                except (NoSchemaFoundInWildMode, TooManyRedirects, AttributeError):
                     recipe = None
                 recipes_requests += 1
                 # No recipe returned -> doesn't exist
