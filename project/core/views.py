@@ -91,7 +91,8 @@ def search(request):
             "search_exp": search_exp,
             "included_ingr": included_ingr,
             "excluded_ingr": excluded_ingr,
-            "must_have": must_have
+            "must_have": must_have,
+            "tag": tag_filter
         },
         "time": total_time,
         "result_count": len(res)

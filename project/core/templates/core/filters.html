@@ -4,12 +4,11 @@
 {% load static %}
 
 <div id="filters" class="container pt-2">
-    <a id="deleteFilter" class="btn btn-outline-primary rounded-pill mr-1 mb-1" href="?{% url_replace tag='' page=1 %}">
-        All
-    </a>
     {% for tag, count in tags %}
-    <a id="{{ tag }}Filter" class="btn btn-outline-secondary rounded-pill mr-1 mb-1" href="?{% url_replace tag=tag page=1 %}">
-        {{ tag|capfirst }} ({{ count }})
+    <a id="{{ tag }}Filter" class="btn {% if search_params.tag == tag %} btn-secondary {% else  %} btn-outline-secondary {% endif %}
+    rounded-pill mr-1 mb-2" href={% if search_params.tag == tag %} "?{% url_replace tag='' page=1 %}" {% else  %} "?{% url_replace tag=tag page=1 %}" {% endif %}>
+        {{ tag|title }}
+        <span class="badge badge-pill badge-secondary">{{ count }}</span>
     </a>
     {% endfor %}
 </div>
