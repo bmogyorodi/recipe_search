@@ -39,6 +39,13 @@ class RecipeToken(models.Model):
         indexes = [models.Index(fields=["recipe"])]
 
 
+class RecipeTokenFrequencies(models.Model):
+    token = models.ForeignKey("Token", on_delete=models.CASCADE)
+    recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
+    in_title = models.BooleanField()
+    tf = models.FloatField(blank=False, null=False)
+
+
 class Tag(CleanableModel):
     title = models.CharField(max_length=64)
 
