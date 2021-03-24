@@ -263,4 +263,4 @@ Temporary Items
 # Spell checker data
 *token_counts.pickle
 
-Pipfile.lock
+*Pipfile.lock
