@@ -43,7 +43,7 @@ class RecipeTokenFrequency(models.Model):
     token = models.ForeignKey("Token", on_delete=models.CASCADE)
     recipe = models.ForeignKey("Recipe", on_delete=models.CASCADE)
     in_title = models.BooleanField()
-    tf = models.FloatField(blank=False, null=False)
+    tf = models.IntegerField(blank=False, null=False)
 
 
 class Tag(CleanableModel):
