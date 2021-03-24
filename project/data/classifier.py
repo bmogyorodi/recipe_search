@@ -72,12 +72,13 @@ class Cuisine_Classifier:
             label_column["cuisine"].append(labels)            
         return pd.concat([test_data[["id","ingredients"]], pd.DataFrame(data=label_column)], axis=1, join="inner")
     
-class Test():
+class Classifier():
+    def __init__(self):
+        pass
     def GetRecipes(self):
+        print("Get Recipes")
         recipes = Recipe.objects.annotate(ing_titles=ArrayAgg("ingredients__title"),tag_titles=ArrayAgg("tags__pk"))
-        print("Hello2")
         data=list(recipes.values_list("pk", "ing_titles", "tag_titles"))
-        print("Hello2")
         recipe_data={"id":[],"ingredients":[],"cuisine":[]}
         unlabeled_recipe={"id":[],"ingredients":[]}
         for recipe in data:
@@ -100,7 +101,7 @@ class Test():
         for index, value in counts.items():
             if value>=100:
                 important_classes.append(index)
-            print(f"Index : {index}, Value : {value}")
+            #print(f"Index : {index}, Value : {value}")
         recipe_data={"id":[],"ingredients":[],"cuisine":[]}
         unlabeled_recipe={"id":[],"ingredients":[]}
         for recipe in data:
@@ -118,19 +119,19 @@ class Test():
         test_data=unlabeled_df
         return train_data,test_data
     def GetIngredientList(self):
+        print("Get Ingredients!")
         ings = Ingredient.objects.annotate(count=models.Count("recipe"))
         data = [{"pk": d.pk, "title": d.title, "num_recipe": d.count} for d in ings]
-        #print(data)
         ingredientsList=pd.DataFrame(data)
         ingredientsList=ingredientsList.loc[ingredientsList["num_recipe"]>=100]
         ingredientsList=ingredientsList["title"].array
-        print(ingredientsList)
         return ingredientsList
     def Classification(self):
+        print("Classification start!")
         labelled_recipe,unlabelled_recipe=self.GetRecipes()
         #shortener for testing remove two lines below to avoid shortening training and test data
-        labelled_recipe=labelled_recipe[0:100]
-        unlabelled_recipe=unlabelled_recipe[0:100]
+        #labelled_recipe=labelled_recipe[0:100]
+        #unlabelled_recipe=unlabelled_recipe[0:100]
         ingredientsList=self.GetIngredientList()
         model=Cuisine_Classifier(ingredientsList,labelled_recipe)
         testing,labels=model.ReturnAllProba(unlabelled_recipe)
@@ -145,12 +146,23 @@ class Test():
         labelled_data=self.Classification()
         tags=Tag.objects.all()
         recipe=Recipe.objects.all()
-        print(tags)
+        #print(tags)
         for recipe in labelled_data.iterrows():
             recipe=recipe[1]
-            print(recipe["cuisine"])
+            #print(recipe["cuisine"])
             if len(recipe["cuisine"])>0:
                 Recipe.objects.get(id=recipe["id"]).tags.add(Tag.objects.get(id=recipe["cuisine"][0]))
+    def PrintLabels(self):
+        labelled_data=self.Classification()
+        tags=Tag.objects.all()
+        recipe=Recipe.objects.all()
+        #print(tags)
+        for recipe in labelled_data.iterrows():
+            recipe=recipe[1]
+            #print(recipe["cuisine"])
+            if len(recipe["cuisine"])>0:
+                print(Recipe.objects.get(id=recipe["id"]).title+" "+Tag.objects.get(id=recipe["cuisine"][0]).title)
+
     def NumLabelled(self):
         train_data,test_data=self.GetRecipes()
         print(train_data.shape[0])
