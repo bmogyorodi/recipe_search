@@ -261,6 +261,6 @@ Temporary Items
 *.dump
 
 # Spell checker data
-*spellchecker_data/*
+*token_counts.pickle
 
 Pipfile.lock
