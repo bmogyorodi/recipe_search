@@ -259,3 +259,8 @@ Temporary Items
 # Database dumps
 
 *.dump
+
+# Spell checker data
+*spellchecker_data/*
+
+Pipfile.lock
