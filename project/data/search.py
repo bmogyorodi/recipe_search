@@ -3,7 +3,7 @@ from .spelling import SpellChecker
 from .models import RecipeToken, Recipe, RecipeIngredient
 from collections import defaultdict
 import random
-from django.db.models import Count, Min
+from django.db.models import Count, Min, Avg
 from math import log10
 
 
@@ -17,7 +17,7 @@ def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
 
     if len(query) == 0:
         random.seed(10)
-        res = list(recipe_ids)
+        res = list(recipe_ids) if recipe_ids is not None else []
         random.shuffle(res)
     else:
         res = RankedSearch().search(query)
@@ -62,18 +62,21 @@ class BooleanIngredientSearch:
 
 
 class RankedSearch:
+    AVG_LENGTH = Recipe.objects.aggregate(Avg("length"))["length__avg"]
+    DOC_COUNT = Recipe.objects.count()
+
     def __init__(self):
         self.indexer = Indexer()
-        self.doc_count = Recipe.objects.count()
         self.spell_checker = SpellChecker()
 
     def search(self, query):
-        def tfidf_weight(tf, df, N):
-            return (1 + log10(tf)) * log10(N / df)
+        def tfidf_weight(tf, df):
+            return (1 + log10(tf)) * log10(self.DOC_COUNT / df)
 
-        def bm25_weight(tf, df, N, k=1.5):
-            # TODO
-            return
+        def bm25_weight(tf, df, L, k=1.5):
+            tf_component = tf / (k * L / self.AVG_LENGTH + tf + 0.5)
+            idf_component = log10((self.DOC_COUNT - df + 0.5) / (df + 0.5))
+            return tf_component * idf_component
 
         tokens = self.indexer._preprocess_text(query)
 
@@ -86,17 +89,17 @@ class RankedSearch:
             recipetoken_objs = RecipeToken.objects.filter(token__title=token)
 
             # Find the document frequency (df) from the inverted index
-            df = recipetoken_objs.count()
+            df = recipetoken_objs.aggregate(Count("recipe_id", distinct=True))["recipe_id__count"]
 
             # Calculate the term frequency (tf) for each document
-            tfs = (recipetoken_objs.values("recipe_id")
+            tfs = (recipetoken_objs.values("recipe_id", "recipe__length")
                                    .annotate(min_token_type=Min("token_type"), tf=Count("*"))
-                                   .values_list("recipe_id", "min_token_type", "tf"))
+                                   .values_list("recipe_id", "min_token_type", "tf", "recipe__length"))
 
             # Update recipe tfidf vectors
-            for recipe_id, min_token_type, tf in tfs:
-                scores[recipe_id] += tfidf_weight(tf, df, self.doc_count) * \
-                    (2 if min_token_type == 1 else 1)
+            for recipe_id, min_token_type, tf, length in tfs:
+                scores[recipe_id] += bm25_weight(tf, df, length) * \
+                    (5 if min_token_type == 1 else 1)
 
         return [x[0] for x in sorted(scores.items(), key=lambda item: item[1], reverse=True)]
 

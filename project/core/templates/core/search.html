@@ -14,7 +14,6 @@
 <div id="searchResults">
     {% if time %}
     <div id="resultInfo" class="container pt-4">
-        <h5>{{ time }}</h5>
         <h6 class="text-secondary">Found {{ result_count }} recipes in {{ time|floatformat:3 }} seconds</h6>
     </div>
     {% block filters %}

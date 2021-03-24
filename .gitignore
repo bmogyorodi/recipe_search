@@ -2,6 +2,9 @@
 # Created by https://www.toptal.com/developers/gitignore/api/python,django,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=python,django,visualstudiocode,macos
 
+# Server running commands
+build
+
 ### Django ###
 *.log
 *.pot
@@ -252,3 +255,12 @@ Temporary Items
 .apdisk
 
 # End of https://www.toptal.com/developers/gitignore/api/python,django,visualstudiocode
+
+# Database dumps
+
+*.dump
+
+# Spell checker data
+*token_counts.pickle
+
+Pipfile.lock

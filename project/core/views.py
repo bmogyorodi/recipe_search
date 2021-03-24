@@ -1,23 +1,20 @@
 from django.shortcuts import render
 from django.core.paginator import Paginator
-from django.db.models import When, Case, DecimalField
+from django.db.models import Count
 
-from data.models import Recipe, Ingredient
+from data.models import Recipe, Ingredient, Tag
 from data.search import recipe_search
 
 from time import time
 
 
-# TODO: change to actual ingredients and tags
-search_ingredients = ["Onion", "Parmesan", "Chicken", "Tomato",
-                      "Garlic", "Cheddar", "Salt", "Pepper", "Plain Flour"]
-search_tags = ["Spanish", "Greek", "Italian",
-               "Mexican", "British", "Polish", "German"]
+search_ingredients = list(Ingredient.objects.values_list("title", flat=True))
+search_ingredients.remove("")
 
 
 def home(request):
     # Retrieve 3 recipes at random to display as suggestions
-    recipes = Recipe.objects.all().order_by("?")[:3]
+    recipes = Recipe.objects.filter(ratings__gte=3.5).order_by("?")[:3]
 
     context = {
         "recipes": recipes,
@@ -34,6 +31,7 @@ def search(request):
     search_exp = request.GET.get("q", default="").replace("+", " ")
     page_number = request.GET.get('page', default=1)
 
+    tag_filter = request.GET.get("tag", default="")
     included_ingr_str = request.GET.get("include", default="")
     included_ingr = [] if included_ingr_str == "" else included_ingr_str.split(
         ",")
@@ -68,11 +66,19 @@ def search(request):
         request.session["included_ingr"] = included_ingr
         request.session["excluded_ingr"] = excluded_ingr
         request.session["must_have"] = must_have
-
-    total_time = f"Total time: {time() - t_start:.3f} seconds"
+    # Filter by tag if any selected
+    if tag_filter != "":
+        res = [r for r in res
+               if tag_filter in r.tags.values_list("title", flat=True)]
+    total_time = time() - t_start
+    # Get paginator and current page
     paginator = Paginator(res, 10)
-
     page = paginator.get_page(page_number)
+    # Compile available search tags for retrieved recipes
+    search_tags = Tag.objects.filter(
+        recipe__pk__in=request.session["recipe_pks"]).annotate(
+            count=Count("recipe")
+    ).values_list("title", "count").distinct().order_by("-count")
 
     context = {
         "page": page,
@@ -82,7 +88,8 @@ def search(request):
             "search_exp": search_exp,
             "included_ingr": included_ingr,
             "excluded_ingr": excluded_ingr,
-            "must_have": must_have
+            "must_have": must_have,
+            "tag": tag_filter
         },
         "time": total_time,
         "result_count": len(res)
