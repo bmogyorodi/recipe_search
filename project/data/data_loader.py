@@ -5,7 +5,8 @@ import bz2
 import os
 import time
 from datetime import timedelta
-from data.models import Recipe, Source
+from django.db.models import Min, Count
+from data.models import Recipe, Source, RecipeToken, RecipeTokenFrequency, Token
 
 
 class DataLoader():
@@ -104,3 +105,42 @@ class DataLoader():
                 Source.objects.get_or_create(
                     source_id=source_id, title=source_name, url=source_url, favicon=favicon_url)
         print(f"Imported information about {count} sources")
+
+    def construct_recipetoken_frequency_table(self):
+        RecipeTokenFrequency.objects.all().delete()
+        res = (RecipeToken.objects
+                          .values("recipe", "token")
+                          .annotate(min_token_type=Min("token_type"), tf=Count("*")))
+
+        objs = []
+        count = 0
+        start_time = time.time()
+        for r in res.iterator():
+            count += 1
+            print(f"Token {r['token']} "
+                  f"| Recipe {r['recipe']} "
+                  f"| {count} completed | {time.time() - start_time:.2f}s",
+                  "\033[K", end="\r", flush=True)
+            objs.append(RecipeTokenFrequency(
+                token=Token.objects.get(id=r["token"]),
+                recipe=Recipe.objects.get(id=r["recipe"]),
+                in_title=r["min_token_type"] == 1,
+                tf=r["tf"]
+            ))
+            if len(objs) >= 2000:
+                RecipeTokenFrequency.objects.bulk_create(objs)
+                objs = []
+
+        print("\n\n")
+
+    def delete_rare_tokens(self):
+        token_counts = RecipeToken.objects.values("token").annotate(count=Count("*"))
+        token_ids_to_delete = [r["token"] for r in token_counts.filter(count__lte=5)]
+        for token_id in token_ids_to_delete:
+            Token.objects.get(id=token_id).delete()
+
+    def calculate_recipe_frequencies(self):
+        tokens = Token.objects.all()
+        for token in tokens:
+            token.recipe_count = token.recipes.distinct().count()
+            token.save()

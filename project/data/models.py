@@ -16,6 +16,7 @@ class Token(CleanableModel):
         through_fields=("token", "recipe"),
         related_name="tokens",
         related_query_name="token")
+    recipe_count = models.PositiveIntegerField(null=True)
 
     def clean(self, *args, **kwargs):
         # Get rid of whitespace, lower-case, and truncate
