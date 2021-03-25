@@ -9,20 +9,8 @@ class SpellChecker:
     _DATA_DIR = Path(__file__).parent.resolve() / "spellchecker_data"
     _TOKEN_COUNTS_FILENAME = "token_counts.pickle"
 
-    try:
-        with open(_DATA_DIR / _TOKEN_COUNTS_FILENAME, "rb") as f:
-            token_counts = pickle.load(f)
-
-        if len(token_counts) != Token.objects.all().count():
-            token_counts = dict(Token.objects.annotate(token_count=Count("recipes"))
-                                     .values_list("title", "token_count"))
-            with open(_DATA_DIR / _TOKEN_COUNTS_FILENAME, "wb") as f:
-                pickle.dump(token_counts, f)
-    except FileNotFoundError:
-        token_counts = dict(Token.objects.annotate(token_count=Count("recipes"))
-                                 .values_list("title", "token_count"))
-        with open(_DATA_DIR / _TOKEN_COUNTS_FILENAME, "wb") as f:
-            pickle.dump(token_counts, f)
+    with open(_DATA_DIR / _TOKEN_COUNTS_FILENAME, "rb") as f:
+        token_counts = pickle.load(f)
 
     def _is_known(self, token):
         """
