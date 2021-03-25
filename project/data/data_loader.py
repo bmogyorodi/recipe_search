@@ -117,19 +117,20 @@ class DataLoader():
         start_time = time.time()
         for r in res.iterator():
             count += 1
-            print(f"Token {r['token']} "
-                  f"| Recipe {r['recipe']} "
-                  f"| {count} completed | {time.time() - start_time:.2f}s",
-                  "\033[K", end="\r", flush=True)
             objs.append(RecipeTokenFrequency(
                 token=Token.objects.get(id=r["token"]),
                 recipe=Recipe.objects.get(id=r["recipe"]),
                 in_title=r["min_token_type"] == 1,
                 tf=r["tf"]
             ))
-            if len(objs) >= 2000:
+            if len(objs) >= 10000:
                 RecipeTokenFrequency.objects.bulk_create(objs)
                 objs = []
+
+                print(f"Token {r['token']} "
+                      f"| Recipe {r['recipe']} "
+                      f"| {count} completed | {time.time() - start_time:.2f}s",
+                      "\033[K", end="\r", flush=True)
 
         print("\n\n")
 
