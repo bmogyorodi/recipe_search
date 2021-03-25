@@ -131,7 +131,11 @@ class DataLoader():
                       f"| Recipe {r['recipe']} "
                       f"| {count} completed | {time.time() - start_time:.2f}s",
                       "\033[K", end="\r", flush=True)
-
+        RecipeTokenFrequency.objects.bulk_create(objs)
+        print(f"Token {r['token']} "
+              f"| Recipe {r['recipe']} "
+              f"| {count} completed | {time.time() - start_time:.2f}s",
+              "\033[K", end="\r", flush=True)
         print("\n\n")
 
     def delete_rare_tokens(self):
