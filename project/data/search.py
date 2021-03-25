@@ -1,10 +1,14 @@
 from .indexer import Indexer
 from .spelling import SpellChecker
-from .models import RecipeToken, Recipe, RecipeIngredient
+from .models import RecipeToken, Recipe, RecipeIngredient, RecipeTokenFrequency, Token
 from collections import defaultdict
 import random
 from django.db.models import Count, Min, Avg
 from math import log10
+import logging
+import time
+
+logger = logging.getLogger(__name__)
 
 
 def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
@@ -100,7 +104,36 @@ class RankedSearch:
             for recipe_id, min_token_type, tf, length in tfs:
                 scores[recipe_id] += bm25_weight(tf, df, length) * \
                     (5 if min_token_type == 1 else 1)
+        return [x[0] for x in sorted(scores.items(), key=lambda item: item[1], reverse=True)]
 
+    def new_search(self, query):
+        def tfidf_weight(tf, df):
+            return (1 + log10(tf)) * log10(self.DOC_COUNT / df)
+
+        def bm25_weight(tf, df, L, k=1.5):
+            tf_component = tf / (k * L / self.AVG_LENGTH + tf + 0.5)
+            idf_component = log10((self.DOC_COUNT - df + 0.5) / (df + 0.5))
+            return tf_component * idf_component
+
+        tokens = self.indexer._preprocess_text(query)
+
+        # Correct the spelling of the tokens
+        tokens = self.spell_checker.correct_spelling(tokens)
+
+        scores = defaultdict(float)
+
+        for token in tokens:
+            # Find the document frequency (df) from the inverted index
+            df = Token.objects.get(title=token).recipe_count
+
+            tfs = (RecipeTokenFrequency.objects
+                                       .filter(token__title=token)
+                                       .values_list("recipe", "in_title", "tf", "recipe__length"))
+
+            # Update recipe tfidf vectors
+            for recipe_id, in_title, tf, length in tfs:
+                scores[recipe_id] += bm25_weight(tf, df, length) * \
+                    (5 if in_title else 1)
         return [x[0] for x in sorted(scores.items(), key=lambda item: item[1], reverse=True)]
 
     """
