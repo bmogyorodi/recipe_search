@@ -5,6 +5,8 @@ import numpy as np # linear algebra
 import pandas as pd # data processing, CSV file I/O (e.g. pd.read_csv)
 import os
 from data.models import *
+from sklearn.model_selection import StratifiedKFold
+from sklearn.model_selection import cross_val_score
 from sklearn import preprocessing
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC, LinearSVC
@@ -167,6 +169,13 @@ class Classifier():
         train_data,test_data=self.GetRecipes()
         print(train_data.shape[0])
         print(test_data.shape[0])
+    def CrossValScore(self):
+        train_data,test_data=self.GetRecipes()
+        ingredientsList=self.GetIngredientList()
+        model=Cuisine_Classifier(ingredientsList,train_data)
+        kfold = StratifiedKFold(n_splits=10, random_state=1, shuffle=True)
+        cv_results = cross_val_score(LogisticRegression(solver='liblinear', multi_class='ovr'), model.train_data.drop(['id','ingredients','cuisine'],axis=1), model.train_data['cuisine'], cv=kfold, scoring='accuracy')
+        print('Logistic regression 10 fold cross test: %f (%f)' % (cv_results.mean(), cv_results.std()))
         
 
         
