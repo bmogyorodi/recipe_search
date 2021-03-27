@@ -73,7 +73,7 @@ class RankedSearch:
         self.indexer = Indexer()
         self.spell_checker = SpellChecker()
 
-    def search(self, query):
+    def old_search(self, query):
         def tfidf_weight(tf, df):
             return (1 + log10(tf)) * log10(self.DOC_COUNT / df)
 
@@ -106,7 +106,7 @@ class RankedSearch:
                     (5 if min_token_type == 1 else 1)
         return [x[0] for x in sorted(scores.items(), key=lambda item: item[1], reverse=True)]
 
-    def new_search(self, query):
+    def search(self, query):
         def tfidf_weight(tf, df):
             return (1 + log10(tf)) * log10(self.DOC_COUNT / df)
 
