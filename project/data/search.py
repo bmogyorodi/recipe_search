@@ -138,11 +138,11 @@ class RankedSearch:
             # print(time.time() - start_time)
 
             # start_time = time.time()
-            separated = list(zip(*res))
-            recipe_ids = list(separated[0])
-            in_titles = np.array(separated[1], dtype=int)
-            tfs = np.array(separated[2])
-            lengths = np.array(separated[3])
+            res = np.array(res)
+            recipe_ids = res[:, 0]
+            in_titles = res[:, 1]
+            tfs = res[:, 2]
+            lengths = res[:, 3]
             # print(time.time() - start_time)
 
             # start_time = time.time()
