@@ -27,7 +27,7 @@ class IngredientAdmin(admin.ModelAdmin):
 
 @admin.register(Token)
 class TokenAdmin(admin.ModelAdmin):
-    list_display = ("title", "get_num_recipe_tokens")
+    list_display = ("title", "get_num_recipe_tokens", "recipe_count")
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)

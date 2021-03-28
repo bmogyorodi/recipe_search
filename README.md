@@ -54,3 +54,18 @@ ALLOWED_HOSTS="127.0.0.1 0.0.0.0 localhost"
 - With Docker, you use `docker-compose up -d --build` or if containers have been created already `docker-compose start`
 - Without Docker, it's `pipenv run python project/manage.py runserver 0.0.0.0:8000`
   - **But**, you should also migrate any new migrations and run `pipenv install` in case there were new changes. It's generally simpler to just use Docker.
+
+## Database backup
+
+### Dumping the database
+
+1. Dump the DB within the container: `docker-compose exec db pg_dump -d recipesearch -U recipesearch_user -Fc -f pgdump.dump`
+2. Copy it over from the container `docker cp recipe_search_db_1:/pgdump.dump ./`
+3. _(optional)_ Delete the dump within the container: `docker-compose exec db rm pgdump.dump`
+
+### Restoring the database
+
+1. Copy dump over to the container: `docker cp pgdump.dump recipe_search_db_1:/`
+2. Restore it in the container: `docker-compose exec db pg_restore -d recipesearch -U recipesearch_user pgdump.dump --clean`
+   - The `--clean` tag overwrites previous DB data
+3. _(optional)_ Delete the dump within the container: `docker-compose exec db rm pgdump.dump`
