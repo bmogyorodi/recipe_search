@@ -12,7 +12,7 @@ class SpellChecker:
         # Possible the pickle file doesn't exist yet
         if not self._DATAFILE.exists():
             from .data_loader import DataLoader
-            DataLoader().construct_spellchecker_data()
+            DataLoader.construct_spellchecker_data()
         with open(self._DATAFILE, "rb") as f:
             self.token_counts = pickle.load(f)
 

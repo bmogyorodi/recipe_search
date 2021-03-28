@@ -152,8 +152,11 @@ class DataLoader():
             token.recipe_count = token.recipes.distinct().count()
             token.save()
 
-    def construct_spellchecker_data(self):
+    @staticmethod
+    def construct_spellchecker_data():
         token_counts = dict(Token.objects.annotate(token_count=Count("recipes"))
                                  .values_list("title", "token_count"))
+        # Make parent directory if it doesn't exist
+        SpellChecker._DATA_DIR.mkdir(parents=True, exist_ok=True)
         with open(SpellChecker._DATAFILE, "wb") as f:
             pickle.dump(token_counts, f)
