@@ -25,6 +25,7 @@ class SpellChecker:
     def _find_most_common_correct_token_spelling(self, token):
         """
         Finds the most common token that is at most 2 edit distances away from the givent token
+        and has the least edit distance
         """
         candidates = self._get_candidates(token)
         if candidates:
@@ -43,8 +44,11 @@ class SpellChecker:
         """
         Finds all tokens within at most two edit distances that exist in the database
         """
-        tokens_within_2_edits = self._tokens_1_edit_away(token) | self._tokens_2_edits_away(token)
-        return tokens_within_2_edits & self.token_counts.keys()
+        candidates_1_edit = self._tokens_1_edit_away(token) & self.token_counts.keys()
+        if candidates_1_edit:
+            return candidates_1_edit
+        else:
+            return self._tokens_2_edits_away(token) & self.token_counts.keys()
 
     def _tokens_2_edits_away(self, token):
         """
