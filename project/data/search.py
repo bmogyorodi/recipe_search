@@ -5,10 +5,9 @@ from collections import defaultdict
 import random
 from django.db.models import Count, Min, Avg
 from math import log10
-import logging
+import numpy as np
 import time
 
-logger = logging.getLogger(__name__)
 
 
 def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
@@ -115,6 +114,11 @@ class RankedSearch:
             idf_component = log10((self.DOC_COUNT - df + 0.5) / (df + 0.5))
             return tf_component * idf_component
 
+        def bm25_weights_vector(tfs, df, lengths, k=1.5):
+            tf_components = tfs / (k * lengths / self.AVG_LENGTH + tfs + 0.5)
+            idf_component = np.log10((self.DOC_COUNT - df + 0.5) / (df + 0.5))
+            return tf_components * idf_component
+
         tokens = self.indexer._preprocess_text(query)
 
         # Correct the spelling of the tokens
@@ -124,55 +128,30 @@ class RankedSearch:
 
         for token in tokens:
             # Find the document frequency (df) from the inverted index
+            # start_time = time.time()
             df = Token.objects.get(title=token).recipe_count
+            # print(time.time() - start_time)
 
-            tfs = (RecipeTokenFrequency.objects
-                                       .filter(token__title=token)
-                                       .values_list("recipe", "in_title", "tf", "recipe__length"))
+            # start_time = time.time()
+            res = (RecipeTokenFrequency.objects.filter(token__title=token)
+                                               .values_list("recipe", "in_title", "tf", "recipe__length"))
+            # print(time.time() - start_time)
 
-            # Update recipe tfidf vectors
-            for recipe_id, in_title, tf, length in tfs:
-                scores[recipe_id] += bm25_weight(tf, df, length) * \
-                    (5 if in_title else 1)
+            # start_time = time.time()
+            res = np.array(res)
+            recipe_ids = res[:, 0]
+            in_titles = res[:, 1]
+            tfs = res[:, 2]
+            lengths = res[:, 3]
+            # print(time.time() - start_time)
+
+            # start_time = time.time()
+            weights = bm25_weights_vector(tfs, df, lengths) * (in_titles * 4 + 1)
+            # print(time.time() - start_time)
+
+            # start_time = time.time()
+            for i in range(len(recipe_ids)):
+                scores[recipe_ids[i]] += weights[i]
+            # print(time.time() - start_time)
+
         return [x[0] for x in sorted(scores.items(), key=lambda item: item[1], reverse=True)]
-
-    """
-    def search(self, query):
-        def tfidf_weight(tf, df, N):
-            return (1 + log10(tf)) * log10(N / df)
-
-        def cosine_similarity(v1, v2):
-            return v1.dot(v2) / (np.sqrt(v1.dot(v1)) * np.sqrt(v2.dot(v2)))
-
-        tokens = self.indexer._preprocess_text(query)
-
-        # Correct the spelling of the tokens
-        tokens = self.spell_checker.correct_spelling(tokens)
-
-        query_token_counts = list(Counter(tokens).items())
-        tfidf_vectors = defaultdict(lambda: np.zeros(len(query_token_counts)))
-        query_tfidf_vector = np.zeros(len(query_token_counts))
-        scores = defaultdict(float)
-
-        for i in range(len(query_token_counts)):
-            token, query_tf = query_token_counts[i]
-
-            # Find the document frequency (df) from the inverted index
-            df = RecipeToken.objects.filter(token__title=token).count()
-
-            # Calculate the term frequency (tf) for each document
-            tfs = Counter(RecipeToken.objects.filter(token__title=token)
-                                             .values_list("recipe__id", flat=True))
-
-            # Update query tfidf vector
-            query_tfidf_vector[i] = tfidf_weight(query_tf, df, self.doc_count)
-
-            # Update recipe tfidf vectors
-            for recipe_id, tf in tfs.items():
-                tfidf_vectors[recipe_id][i] = tfidf_weight(tf, df, self.doc_count)
-
-        for recipe_id, tfidf_vector in tfidf_vectors.items():
-            scores[recipe_id] = cosine_similarity(query_tfidf_vector, tfidf_vector)
-
-        return sorted(scores.items(), key=lambda item: item[1], reverse=True)
-    """
