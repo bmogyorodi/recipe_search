@@ -41,6 +41,11 @@ def search(request):
     must_have_ingr_str = request.GET.get("musthave", default="")
     must_have = [] if must_have_ingr_str == "" else must_have_ingr_str.split(
         ",")
+    # TODO delete tokens < 10 num_recipes
+    # TODO delete tags < 100 num_recipes
+    # TODO spell checker should prioritize single-edits over double-edits
+    # TODO (dimitris) store "tf" in database and update on run
+    # TODO add a "help" section and some tooltips, e.g. for advanced search
 
     t_start = time()
     # If search is identical to the last (e.g. new page), use session instead

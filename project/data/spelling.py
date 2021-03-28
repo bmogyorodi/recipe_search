@@ -6,9 +6,15 @@ import pickle
 class SpellChecker:
     _DATA_DIR = Path(__file__).parent.resolve() / "spellchecker_data"
     _TOKEN_COUNTS_FILENAME = "token_counts.pickle"
+    _DATAFILE = _DATA_DIR / _TOKEN_COUNTS_FILENAME
 
-    with open(_DATA_DIR / _TOKEN_COUNTS_FILENAME, "rb") as f:
-        token_counts = pickle.load(f)
+    def __init__(self):
+        # Possible the pickle file doesn't exist yet
+        if not self._DATAFILE.exists():
+            from .data_loader import DataLoader
+            DataLoader().construct_spellchecker_data()
+        with open(self._DATAFILE, "rb") as f:
+            self.token_counts = pickle.load(f)
 
     def _is_known(self, token):
         """

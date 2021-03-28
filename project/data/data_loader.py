@@ -6,13 +6,13 @@ import os
 import time
 from datetime import timedelta
 from django.db.models import Min, Count
-from data.models import Recipe, Source, RecipeToken, RecipeTokenFrequency, Token
+
+from .spelling import SpellChecker
+from .models import Recipe, Source, RecipeToken, RecipeTokenFrequency, Token
 
 
 class DataLoader():
-    _SPELLCHECKER_DATA_DIR = Path(__file__).parent.resolve() / "spellchecker_data"
     _RAW_DATA_DIR = Path(__file__).parent.resolve() / "data"
-    SPELLCHECKER_TOKEN_COUNTS_FILENAME = "token_counts.pickle"
     SOURCE_INFO_FILENAME = "sources.psv"
 
     def __init__(self, files_to_load=None):
@@ -155,5 +155,5 @@ class DataLoader():
     def construct_spellchecker_data(self):
         token_counts = dict(Token.objects.annotate(token_count=Count("recipes"))
                                  .values_list("title", "token_count"))
-        with open(self._SPELLCHECKER_DATA_DIR / self.SPELLCHECKER_TOKEN_COUNTS_FILENAME, "wb") as f:
+        with open(SpellChecker._DATAFILE, "wb") as f:
             pickle.dump(token_counts, f)
