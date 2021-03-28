@@ -140,9 +140,18 @@ class DataLoader():
               "\033[K", end="\r", flush=True)
         print("\n\n")
 
+    def store_recipetoken_frequency_recipe_length(self):
+        from django.db.models import OuterRef, Subquery
+        RecipeTokenFrequency.objects.all().update(
+            recipe_length=Subquery(
+                RecipeTokenFrequency.objects.filter(
+                    pk=OuterRef('pk')).values('recipe__length')[:1]))
+
     def delete_rare_tokens(self):
-        token_counts = RecipeToken.objects.values("token").annotate(count=Count("*"))
-        token_ids_to_delete = [r["token"] for r in token_counts.filter(count__lte=5)]
+        token_counts = RecipeToken.objects.values(
+            "token").annotate(count=Count("*"))
+        token_ids_to_delete = [r["token"]
+                               for r in token_counts.filter(count__lte=5)]
         for token_id in token_ids_to_delete:
             Token.objects.get(id=token_id).delete()
 
