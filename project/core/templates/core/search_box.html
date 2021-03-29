@@ -1,113 +1,133 @@
 {% block search_box %}
 
 <div class="container p-4">
-  <div class="row">
-    <div class="col-md-11 p-1">
-      <form id="searchForm" action="/search" method="get" class="input-group input-group-lg">
-          <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe" value="{{ search_params.search_exp }}">
-          <input type="hidden" id="IncludeListInput" name="include" value="">
-          <input type="hidden" id="ExcludeListInput" name="exclude" value="">
-          <input type="hidden" id="MustHaveListInput" name="musthave" value="">
-          <div class="input-group-append">
-            <button class="btn btn-dark" type="submit">
-              <span class="fas fa-search"></span>
+    <div class="row">
+        <div class="col-md-11 p-1">
+            <form id="searchForm" action="/search" method="get" class="input-group input-group-lg">
+                <input id="search_field" type="text" name="q" class="form-control" placeholder="Find a recipe"
+                    value="{{ search_params.search_exp }}">
+                <input type="hidden" id="IncludeListInput" name="include" value="">
+                <input type="hidden" id="ExcludeListInput" name="exclude" value="">
+                <input type="hidden" id="MustHaveListInput" name="musthave" value="">
+                <div class="input-group-append">
+                    <button class="btn btn-dark" type="submit">
+                        <span class="fas fa-search"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-1 p-1">
+            <button class="btn btn-block btn-lg btn-secondary" type="button" data-toggle="collapse"
+                data-target="#advancedSearchBox" title="Advanced Search">
+                <span class="fas fa-sliders-h">
             </button>
-          </div>
-      </form>
-    </div>
-    <div class="col-md-1 p-1">
-      <button class="btn btn-block btn-lg btn-secondary" type="button" data-toggle="collapse" data-target="#advancedSearchBox" title="Advanced Search">
-        <span class="fas fa-sliders-h">
-      </button>
-    </div>
-    <div class="collapse container px-0 pt-2" id="advancedSearchBox">
-      <div class="card card-body card-block">
-        <!--Must-have Ingredients-->
-        <div class="row">
-          <div class="col-md-4">
-            <label for="IngrMustHaveInput"><h5 class="text-info">Must-have ingredients</h5></label>
-            <div class="input-group">
-              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrMustHaveInput" placeholder="Enter ingredient">
-              <div class="input-group-append">
-                <button class="btn btn-secondary" type="submit" id="IngrMustHaveButton">
-                  <span class="fas fa-arrow-right">
-                </button>
-              </div>
+        </div>
+        <div class="collapse container px-0 pt-2" id="advancedSearchBox">
+            <div class="card card-body card-block">
+                <!--Must-have Ingredients-->
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="IngrMustHaveInput">
+                            <h5 class="text-info">Must-have ingredients</h5>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" list="IngredientList" autocomplete="off" class="form-control"
+                                id="IngrMustHaveInput" placeholder="Enter ingredient">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="submit" id="IngrMustHaveButton">
+                                    <span class="fas fa-arrow-right">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <p class="text-muted">All of these ingredients must appear in the recipes</p>
+                        <ul id="MustHaveIngrList" class="list-inline float-bottom">
+                            {% for ingr in search_params.must_have %}
+                            <li class="list-inline-item">
+                                <button data-ingredient="{{ ingr }}" data-list-id="MustHaveIngrList"
+                                    class="btn btn-outline-secondary rounded-pill ingr-button"><i
+                                        class="fas fa-times"></i> {{ ingr }}</button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <hr />
+                <!--Included Ingredients-->
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="IngrIncludeInput">
+                            <h5 class="text-success float-left">Ingredients to include</h5>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" list="IngredientList" autocomplete="off" class="form-control"
+                                id="IngrIncludeInput" placeholder="Enter ingredient">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="submit" id="IngrIncludeButton">
+                                    <span class="fas fa-arrow-right">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <p class="text-muted">All recipes contain at least one of these ingredients</p>
+                        <ul id="IncludedIngrList" class="list-inline float-bottom">
+                            {% for ingr in search_params.included_ingr %}
+                            <li class="list-inline-item">
+                                <button data-ingredient="{{ ingr }}" data-list-id="IncludedIngrList"
+                                    class="btn btn-outline-secondary rounded-pill ingr-button"><i
+                                        class="fas fa-times"></i> {{ ingr }}</button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <hr />
+                <!--Excluded Ingredients-->
+                <div class="row">
+                    <div class="col-md-4">
+                        <label for="IngrExcludeInput">
+                            <h5 class="text-danger float-left">Ingredients to exclude</h5>
+                        </label>
+                        <div class="input-group">
+                            <input type="text" list="IngredientList" autocomplete="off" class="form-control"
+                                id="IngrExcludeInput" placeholder="Enter ingredient">
+                            <div class="input-group-append">
+                                <button class="btn btn-secondary" type="submit" id="IngrExcludeButton">
+                                    <span class="fas fa-arrow-right">
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-8">
+                        <p class="text-muted">These ingredients must not appear in the recipes</p>
+                        <ul id="ExcludedIngrList" class="list-inline">
+                            {% for ingr in search_params.excluded_ingr %}
+                            <li class="list-inline-item">
+                                <button data-ingredient="{{ ingr }}" data-list-id="ExcludedIngrList"
+                                    class="btn btn-outline-secondary rounded-pill ingr-button"><i
+                                        class="fas fa-times"></i> {{ ingr }}</button>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <hr />
+                <!--Clear Button-->
+                <div class="container">
+                    <button id="ClearIngrButton" class="btn btn-danger float-right">Clear</button>
+                </div>
             </div>
-          </div>
-          <div class="col-md-8">
-            <ul id="MustHaveIngrList" class="list-inline float-bottom">
-              {% for ingr in search_params.must_have %}
-                <li class="list-inline-item">
-                  <button data-ingredient="{{ ingr }}" data-list-id="MustHaveIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
         </div>
-        <hr/>
-        <!--Included Ingredients-->
-        <div class="row">
-          <div class="col-md-4">
-            <label for="IngrIncludeInput"><h5 class="text-success">Ingredients to include</h5></label>
-            <div class="input-group">
-              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrIncludeInput" placeholder="Enter ingredient">
-              <div class="input-group-append">
-                <button class="btn btn-secondary" type="submit" id="IngrIncludeButton">
-                  <span class="fas fa-arrow-right">
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-8">
-            <ul id="IncludedIngrList" class="list-inline float-bottom">
-              {% for ingr in search_params.included_ingr %}
-                <li class="list-inline-item">
-                  <button data-ingredient="{{ ingr }}" data-list-id="IncludedIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        <hr/>
-        <!--Excluded Ingredients-->
-        <div class="row">
-          <div class="col-md-4">
-            <label for="IngrExcludeInput"><h5 class="text-danger">Ingredients to exclude</h5></label>
-            <div class="input-group">
-              <input type="text" list="IngredientList" autocomplete="off" class="form-control" id="IngrExcludeInput" placeholder="Enter ingredient">
-              <div class="input-group-append">
-                <button class="btn btn-secondary" type="submit" id="IngrExcludeButton">
-                  <span class="fas fa-arrow-right">
-                </button>
-              </div>
-            </div>
-          </div>
-          <div class="col-md-8">
-            <ul id="ExcludedIngrList" class="list-inline">
-              {% for ingr in search_params.excluded_ingr %}
-                <li class="list-inline-item">
-                  <button data-ingredient="{{ ingr }}" data-list-id="ExcludedIngrList" class="btn btn-outline-secondary rounded-pill ingr-button"><i class="fas fa-times"></i> {{ ingr }}</button>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        <hr/>
-        <!--Clear Button-->
-        <div class="container">
-          <button id="ClearIngrButton" class="btn btn-danger float-right">Clear</button>
-        </div>
-      </div>
     </div>
-  </div>
 </div>
 
 <!-- All Possible Ingredients -->
 <datalist id="IngredientList">
-  {% for ingredient in ingredients %}
+    {% for ingredient in ingredients %}
     <option value="{{ ingredient }}">
-  {% endfor %}
+        {% endfor %}
 </datalist>
 
 {{ search_params.included_ingr|json_script:"IncludedIngrData" }}
