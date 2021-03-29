@@ -140,7 +140,8 @@ class DataLoader():
               "\033[K", end="\r", flush=True)
         print("\n\n")
 
-    def store_recipetoken_frequency_recipe_length(self):
+    @staticmethod
+    def store_recipetoken_frequency_recipe_length():
         from django.db.models import OuterRef, Subquery
         RecipeTokenFrequency.objects.all().update(
             recipe_length=Subquery(
