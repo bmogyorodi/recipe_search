@@ -6,8 +6,8 @@ import random
 from django.db.models import Count, Min, Avg
 from math import log10
 import numpy as np
+import pandas as pd
 import time
-
 
 
 def recipe_search(query="", include=[], must_have=[], exclude=[], count=100):
@@ -92,7 +92,8 @@ class RankedSearch:
             recipetoken_objs = RecipeToken.objects.filter(token__title=token)
 
             # Find the document frequency (df) from the inverted index
-            df = recipetoken_objs.aggregate(Count("recipe_id", distinct=True))["recipe_id__count"]
+            df = recipetoken_objs.aggregate(Count("recipe_id", distinct=True))[
+                "recipe_id__count"]
 
             # Calculate the term frequency (tf) for each document
             tfs = (recipetoken_objs.values("recipe_id", "recipe__length")
@@ -134,19 +135,20 @@ class RankedSearch:
 
             # start_time = time.time()
             res = (RecipeTokenFrequency.objects.filter(token__title=token)
-                                               .values_list("recipe", "in_title", "tf", "recipe__length"))
+                                               .values("recipe", "in_title", "tf", "recipe_length"))
             # print(time.time() - start_time)
 
             # start_time = time.time()
-            res = np.array(res)
-            recipe_ids = res[:, 0]
-            in_titles = res[:, 1]
-            tfs = res[:, 2]
-            lengths = res[:, 3]
+            res = pd.DataFrame.from_records(res)
+            recipe_ids = res["recipe"]
+            in_titles = res["in_title"]
+            tfs = res["tf"]
+            lengths = res["recipe_length"]
             # print(time.time() - start_time)
 
             # start_time = time.time()
-            weights = bm25_weights_vector(tfs, df, lengths) * (in_titles * 4 + 1)
+            weights = bm25_weights_vector(
+                tfs, df, lengths) * (in_titles * 4 + 1)
             # print(time.time() - start_time)
 
             # start_time = time.time()
