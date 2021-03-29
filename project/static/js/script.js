@@ -91,8 +91,10 @@ function ingredientButtonClick() {
 function clearIngredients() {
     includedIngr = [];
     excludedIngr = [];
+    mustHaveIngr = [];
     document.getElementById("IncludedIngrList").innerHTML = "";
     document.getElementById("ExcludedIngrList").innerHTML = "";
+    document.getElementById("MustHaveIngrList").innerHTML = "";
 }
 
 var ingr_buttons = document.getElementsByClassName("ingr-button");
