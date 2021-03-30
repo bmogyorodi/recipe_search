@@ -1,0 +1,25 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+
+[packages]
+django = "==3.1.4"
+autopep8 = "*"
+psycopg2-binary = "==2.8.6"
+gunicorn = "~=20.0"
+recipe-scrapers = "*"
+requests = "*"
+nltk = "*"
+django-autocomplete-light = "*"
+unidecode = "*"
+ingredient-phrase-tagger = {git = "https://github.com/mtlynch/ingredient-phrase-tagger"}
+numpy = "*"
+scikit-learn = "*"
+pandas="*"
+gevent = "*"
+
+[requires]
+python_version = "3.8"
