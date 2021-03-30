@@ -18,7 +18,8 @@ elif [[ "$1" = "build" ]]; then
 elif [[ "$1" = "run" ]]; then
     ./cmd.sh build
     pipenv run gunicorn project.wsgi:application \
-        --workers 5 \
+        --workers 3 \
+        --threads 3 \
         --worker-class=gevent \
         --worker-connections=1000 \
         --max-requests=1000 \
