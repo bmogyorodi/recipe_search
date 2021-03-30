@@ -6,7 +6,9 @@
 <div id="filters" class="container pt-2">
     {% for tag, count in tags %}
     <a id="{{ tag }}Filter" class="btn {% if search_params.tag == tag %} btn-secondary {% else  %} btn-outline-secondary {% endif %}
-    rounded-pill mr-1 mb-2" href={% if search_params.tag == tag %} "?{% url_replace tag='' page=1 %}" {% else  %} "?{% url_replace tag=tag page=1 %}" {% endif %}>
+    rounded-pill mr-1 mb-2" href={% if search_params.tag == tag %} "?{% url_replace tag='' page=1 %}"
+        {% else  %} "?{% url_replace tag=tag page=1 %}" {% endif %} {% if search_params.tag == tag %} data-tooltip
+        data-placement="top" title="Cancel filtering (show all)" {% endif %}>
         {{ tag|title }}
         <span class="badge badge-pill badge-secondary">{{ count }}</span>
     </a>

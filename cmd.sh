@@ -18,15 +18,15 @@ elif [[ "$1" = "build" ]]; then
 elif [[ "$1" = "run" ]]; then
     ./cmd.sh build
     pipenv run gunicorn project.wsgi:application \
-        --workers 3 \
+        --workers 5 \
         --worker-class=gevent \
         --worker-connections=1000 \
         --max-requests=1000 \
         --max-requests-jitter=50 \
         --bind 0.0.0.0:8000 \
         --reload \
-        --timeout 120 \
-        --graceful-timeout 120 \
+        --timeout 150 \
+        --graceful-timeout 150 \
         --capture-output \
         --log-level=debug
 # Test project (OUTSIDE Docker)

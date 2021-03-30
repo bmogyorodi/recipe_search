@@ -6,13 +6,13 @@ import os
 import time
 from datetime import timedelta
 from django.db.models import Min, Count
-from data.models import Recipe, Source, RecipeToken, RecipeTokenFrequency, Token
+
+from .spelling import SpellChecker
+from .models import Recipe, Source, RecipeToken, RecipeTokenFrequency, Token
 
 
 class DataLoader():
-    _SPELLCHECKER_DATA_DIR = Path(__file__).parent.resolve() / "spellchecker_data"
     _RAW_DATA_DIR = Path(__file__).parent.resolve() / "data"
-    SPELLCHECKER_TOKEN_COUNTS_FILENAME = "token_counts.pickle"
     SOURCE_INFO_FILENAME = "sources.psv"
 
     def __init__(self, files_to_load=None):
@@ -140,9 +140,19 @@ class DataLoader():
               "\033[K", end="\r", flush=True)
         print("\n\n")
 
+    @staticmethod
+    def store_recipetoken_frequency_recipe_length():
+        from django.db.models import OuterRef, Subquery
+        RecipeTokenFrequency.objects.all().update(
+            recipe_length=Subquery(
+                RecipeTokenFrequency.objects.filter(
+                    pk=OuterRef('pk')).values('recipe__length')[:1]))
+
     def delete_rare_tokens(self):
-        token_counts = RecipeToken.objects.values("token").annotate(count=Count("*"))
-        token_ids_to_delete = [r["token"] for r in token_counts.filter(count__lte=5)]
+        token_counts = RecipeToken.objects.values(
+            "token").annotate(count=Count("*"))
+        token_ids_to_delete = [r["token"]
+                               for r in token_counts.filter(count__lte=5)]
         for token_id in token_ids_to_delete:
             Token.objects.get(id=token_id).delete()
 
@@ -152,8 +162,11 @@ class DataLoader():
             token.recipe_count = token.recipes.distinct().count()
             token.save()
 
-    def construct_spellchecker_data(self):
+    @staticmethod
+    def construct_spellchecker_data():
         token_counts = dict(Token.objects.annotate(token_count=Count("recipes"))
                                  .values_list("title", "token_count"))
-        with open(self._SPELLCHECKER_DATA_DIR / self.SPELLCHECKER_TOKEN_COUNTS_FILENAME, "wb") as f:
+        # Make parent directory if it doesn't exist
+        SpellChecker._DATA_DIR.mkdir(parents=True, exist_ok=True)
+        with open(SpellChecker._DATAFILE, "wb") as f:
             pickle.dump(token_counts, f)

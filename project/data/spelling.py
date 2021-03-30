@@ -6,9 +6,15 @@ import pickle
 class SpellChecker:
     _DATA_DIR = Path(__file__).parent.resolve() / "spellchecker_data"
     _TOKEN_COUNTS_FILENAME = "token_counts.pickle"
+    _DATAFILE = _DATA_DIR / _TOKEN_COUNTS_FILENAME
 
-    with open(_DATA_DIR / _TOKEN_COUNTS_FILENAME, "rb") as f:
-        token_counts = pickle.load(f)
+    def __init__(self):
+        # Possible the pickle file doesn't exist yet
+        if not self._DATAFILE.exists():
+            from .data_loader import DataLoader
+            DataLoader.construct_spellchecker_data()
+        with open(self._DATAFILE, "rb") as f:
+            self.token_counts = pickle.load(f)
 
     def _is_known(self, token):
         """
@@ -19,6 +25,7 @@ class SpellChecker:
     def _find_most_common_correct_token_spelling(self, token):
         """
         Finds the most common token that is at most 2 edit distances away from the givent token
+        and has the least edit distance
         """
         candidates = self._get_candidates(token)
         if candidates:
@@ -37,8 +44,11 @@ class SpellChecker:
         """
         Finds all tokens within at most two edit distances that exist in the database
         """
-        tokens_within_2_edits = self._tokens_1_edit_away(token) | self._tokens_2_edits_away(token)
-        return tokens_within_2_edits & self.token_counts.keys()
+        candidates_1_edit = self._tokens_1_edit_away(token) & self.token_counts.keys()
+        if candidates_1_edit:
+            return candidates_1_edit
+        else:
+            return self._tokens_2_edits_away(token) & self.token_counts.keys()
 
     def _tokens_2_edits_away(self, token):
         """
