@@ -68,7 +68,9 @@ class Cuisine_Classifier:
     def IngredientsDataTransform(self, data):
         print("Adding ingredient attributes...")
         for i in self.ingredientList:
-            data[i] = np.zeros(len(data))
+            # Some ingredients may have reserved names
+            if i != "ingredients" and i != "id" and i != "cuisine":
+                data[i] = np.zeros(len(data))
         print("Filling out ingredients table...")
         for i in data.index.values:  
             for j in data['ingredients'][i]:
