@@ -36,6 +36,8 @@ document.getElementById("ClearIngrButton").onclick = clearIngredients;
 function addIngredient(ingrArray, ingr, listId) {
     if (!includedIngr.includes(ingr) && !excludedIngr.includes(ingr) 
             && !mustHaveIngr.includes(ingr) && allIngr.includes(ingr)) {
+        // Case-fold ingredient so that upper case searches correctly
+        ingr = ingr.toLowerCase()
         // Add ingredient to list
         ingrArray.push(ingr);
         
